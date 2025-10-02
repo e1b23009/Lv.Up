@@ -285,16 +285,17 @@ public class PlayerController : MonoBehaviour
         // 動きを止める
         rb.linearVelocity = Vector2.zero;
         rb.simulated = false; // Rigidbodyを一時停止
+
+        // ゲーム全体を止める（物理・アニメーション・Update が止まる）
+        Time.timeScale = 0f;
     }
 
     public void Restart()
     {
-        // UIを消して初期化
-        if (gameOverUI != null)
-            gameOverUI.SetActive(false);
+        // UIを消す必要なし（シーン再ロードで勝手に初期化される）
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 
-        transform.position = spawnPoint;
-        rb.simulated = true; // Rigidbodyを再開
-        currentHealth = maxHealth;
+        // ゲームを再開
+        Time.timeScale = 1f;
     }
 }
