@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.SceneManagement; // シーン制御用
 using UnityEngine.UI;              // UI表示用
 using static UnityEditor.PlayerSettings;
