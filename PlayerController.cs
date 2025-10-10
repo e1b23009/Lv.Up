@@ -1,4 +1,3 @@
-using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement; // シーン制御用
 using UnityEngine.UI;              // UI表示用
@@ -15,6 +14,7 @@ public class PlayerController : MonoBehaviour
     [Header("Move")]
     public float moveSpeed = 5f;                    // 通常の移動速度
     public float dashSpeed = 10f;                   // Shiftキー長押し中の移動速度
+
     // 空中速度維持用
     private float storedSpeed = 0f;
 
@@ -55,7 +55,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("UI")]
     public GameObject gameOverUI; // Inspectorで割り当て（Canvas内のGameOverパネル）
-    [SerializeField] private TextMeshProUGUI healthText; // Inspectorで割り当て
+    [SerializeField] private TextMeshProUGUI healthText;
     [SerializeField] private TextMeshProUGUI timerText;
 
     [Header("Game Over")]
@@ -119,8 +119,8 @@ public class PlayerController : MonoBehaviour
                        groundCheck.position + new Vector3(groundCheckSize.x / 2, 0, 0),
                        Color.green);
 
-        // --- 落下でゲームオーバー判定 ---
-        if (!isGameOver && (transform.position.y < fallThreshold || currentTime <= 0f))
+        // --- 落下かタイムオーバーでゲームオーバー判定 ---
+        if (!isGameOver && transform.position.y < fallThreshold && currentTime <= 0f)
         {
             GameOver();
         }
@@ -142,8 +142,7 @@ public class PlayerController : MonoBehaviour
         if (isGrounded)
         {
             storedSpeed = currentSpeed;
-        }
-        else
+        }else
         {
             // 空中では地上で設定された速度を維持
             currentSpeed = storedSpeed;
@@ -299,7 +298,7 @@ public class PlayerController : MonoBehaviour
         sr.color = c;
     }
 
-    void UpdateHealthUI()
+    private void UpdateHealthUI()
     {
         if (healthText != null)
         {
