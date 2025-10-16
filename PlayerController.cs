@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement; // シーン制御用
 using UnityEngine.UI;              // UI表示用
-using static UnityEditor.PlayerSettings;
+using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
     private int currentHealth;                      // 現在の体力
     public float invincibleTime = 2f;               //無敵時間（秒）
     private float invincibleTimer = 0f;
+    [SerializeField] private TextMeshProUGUI healthText;
 
     [Header("Move")]
     public float moveSpeed = 5f;                    // 通常の移動速度
@@ -58,6 +59,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI healthText;
     [SerializeField] private TextMeshProUGUI timerText;
 
+    [Header("UI")]
+    public GameObject gameOverUI; // Inspectorで割り当て（Canvas内のGameOverパネル）
+
     [Header("Game Over")]
     public float fallThreshold = -10f;  // この高さを下回ったらゲームオーバー
     private bool isGameOver = false;
@@ -100,7 +104,6 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         Debug.Log("体力: " + currentHealth);
-
         // --- タイマー減少 ---
         currentTime -= Time.deltaTime;
         UpdateTimerUI();
@@ -120,7 +123,7 @@ public class PlayerController : MonoBehaviour
                        Color.green);
 
         // --- 落下かタイムオーバーでゲームオーバー判定 ---
-        if (!isGameOver && transform.position.y < fallThreshold && currentTime <= 0f)
+        if (!isGameOver && (transform.position.y < fallThreshold || currentTime <= 0f))
         {
             GameOver();
         }
