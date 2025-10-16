@@ -208,7 +208,7 @@ public class PlayerController : MonoBehaviour
                 {
                     if (results[i] == enemyCol && invincibleTimer <= 0f)
                     {
-                        currentHealth -= enemy.GetComponent<Enemy>().damage;
+                        currentHealth -= enemy.GetComponent<IEnemyStatus>().Damage;
                         Debug.Log("体力: " + currentHealth);
                         UpdateHealthUI();
                         if (currentHealth <= 0)

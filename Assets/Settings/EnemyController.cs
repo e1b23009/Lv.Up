@@ -1,10 +1,14 @@
 using UnityEngine;
 
-public class Enemy : MonoBehaviour
+public class Enemy : MonoBehaviour,IEnemyStatus
 {
     public int damage = 1;
-    public float moveSpeed = 3f;    // “G‚ÌˆÚ“®‘¬“x
-    public float detectRadius = 10f; // ƒvƒŒƒCƒ„[Š´’m”ÍˆÍ
+    public float moveSpeed = 3f;    // ï¿½Gï¿½ÌˆÚ“ï¿½ï¿½ï¿½ï¿½x
+    public float detectRadius = 10f; // ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½mï¿½Íˆï¿½
+
+    public int Damage { get; set; }
+    public float MoveSpeed { get; set; }
+    public float DetectRadius { get; set; }
 
     private Rigidbody2D rb;
     private Transform player;
@@ -14,11 +18,11 @@ public class Enemy : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
 
-        // ƒvƒŒƒCƒ„[‚Æ•¨—Õ“Ë‚ğ–³‹‚·‚é
+        // ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½Æ•ï¿½ï¿½ï¿½ï¿½Õ“Ë‚ğ–³ï¿½ï¿½ï¿½ï¿½ï¿½
         GameObject playerObj = GameObject.FindWithTag("Player");
         if (playerObj != null)
         {
-            player = playerObj.transform; // Transform‚ÍƒIƒuƒWƒFƒNƒg‚ÌˆÊ’uipositionjA‰ñ“]irotationjAƒXƒP[ƒ‹iscalej‚ğŠÇ—
+            player = playerObj.transform; // Transformï¿½ÍƒIï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ÌˆÊ’uï¿½ipositionï¿½jï¿½Aï¿½ï¿½]ï¿½irotationï¿½jï¿½Aï¿½Xï¿½Pï¿½[ï¿½ï¿½ï¿½iscaleï¿½jï¿½ï¿½ï¿½Ç—ï¿½
             Collider2D playerCol = playerObj.GetComponent<Collider2D>();
             Collider2D myCol = GetComponent<Collider2D>();
             if (playerCol != null && myCol != null)
@@ -32,19 +36,19 @@ public class Enemy : MonoBehaviour
     {
         if (player == null || !isGrounded) return;
 
-        // ƒvƒŒƒCƒ„[‚Ü‚Å‚Ì‹——£‚ğŒvZ
+        // ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½Ü‚Å‚Ì‹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½vï¿½Z
         float distance = Vector2.Distance(transform.position, player.position);
 
-        // ”¼Œa detectRadius ˆÈ“à‚È‚çƒvƒŒƒCƒ„[‚ÌxÀ•W‚ÉŒü‚©‚Á‚ÄˆÚ“®
+        // ï¿½ï¿½ï¿½a detectRadius ï¿½È“ï¿½ï¿½È‚ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½ï¿½xï¿½ï¿½ï¿½Wï¿½ÉŒï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÄˆÚ“ï¿½
         if (distance <= detectRadius)
         {
-            Vector2 targetPos = new Vector2(player.position.x, rb.position.y); // y‚Í•Ï‚¦‚È‚¢
+            Vector2 targetPos = new Vector2(player.position.x, rb.position.y); // yï¿½Í•Ï‚ï¿½ï¿½È‚ï¿½
             Vector2 newPos = Vector2.MoveTowards(rb.position, targetPos, moveSpeed * Time.fixedDeltaTime);
             rb.MovePosition(newPos);
         }
     }
 
-    // ’n–Ê‚Æ‚ÌÚG”»’èiƒ^ƒO‚Å”»’èj
+    // ï¿½nï¿½Ê‚Æ‚ÌÚGï¿½ï¿½ï¿½ï¿½iï¿½^ï¿½Oï¿½Å”ï¿½ï¿½ï¿½j
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Ground"))
