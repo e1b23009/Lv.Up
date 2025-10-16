@@ -1,7 +1,11 @@
 using UnityEngine;
 using UnityEngine.SceneManagement; // シーン制御用
 using UnityEngine.UI;              // UI表示用
+<<<<<<< Updated upstream
 using TMPro;
+=======
+using static UnityEditor.PlayerSettings;
+>>>>>>> Stashed changes
 
 public class PlayerController : MonoBehaviour
 {
@@ -50,6 +54,7 @@ public class PlayerController : MonoBehaviour
 
     private Vector3 spawnPoint;                     // 開始位置
 
+<<<<<<< Updated upstream
     [Header("Timer Settings")]
     public float startTime = 60f; // 制限時間（秒）
     private float currentTime;
@@ -59,6 +64,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI healthText;
     [SerializeField] private TextMeshProUGUI timerText;
 
+=======
+>>>>>>> Stashed changes
     [Header("UI")]
     public GameObject gameOverUI; // Inspectorで割り当て（Canvas内のGameOverパネル）
 
@@ -73,8 +80,11 @@ public class PlayerController : MonoBehaviour
         currentHealth = maxHealth; // ゲーム開始時は全快
         UpdateHealthUI();
         spawnPoint = transform.position; // 開始位置を記録
+<<<<<<< Updated upstream
         currentTime = startTime;
         UpdateTimerUI();
+=======
+>>>>>>> Stashed changes
 
         if (gameOverUI != null)
             gameOverUI.SetActive(false); // 開始時は非表示
@@ -104,9 +114,12 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         Debug.Log("体力: " + currentHealth);
+<<<<<<< Updated upstream
         // --- タイマー減少 ---
         currentTime -= Time.deltaTime;
         UpdateTimerUI();
+=======
+>>>>>>> Stashed changes
 
         // --- 接地判定を毎フレーム更新 ---
         // OverlapBox で足元に床があるか確認
@@ -122,8 +135,13 @@ public class PlayerController : MonoBehaviour
                        groundCheck.position + new Vector3(groundCheckSize.x / 2, 0, 0),
                        Color.green);
 
+<<<<<<< Updated upstream
         // --- 落下かタイムオーバーでゲームオーバー判定 ---
         if (!isGameOver && (transform.position.y < fallThreshold || currentTime <= 0f))
+=======
+        // --- 落下でゲームオーバー判定 ---
+        if (!isGameOver && transform.position.y < fallThreshold)
+>>>>>>> Stashed changes
         {
             GameOver();
         }
@@ -309,6 +327,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+<<<<<<< Updated upstream
     private void UpdateTimerUI()
     {
         if (timerText != null)
@@ -319,6 +338,8 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+=======
+>>>>>>> Stashed changes
     private void GameOver()
     {
         isGameOver = true;
