@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
     private int currentHealth;                      // 現在の体力
     public float invincibleTime = 2f;               //無敵時間（秒）
     private float invincibleTimer = 0f;
+    [SerializeField] private TextMeshProUGUI healthText;
 
     [Header("Move")]
     public float moveSpeed = 5f;                    // 通常の移動速度
@@ -119,8 +120,9 @@ public class PlayerController : MonoBehaviour
                        groundCheck.position + new Vector3(groundCheckSize.x / 2, 0, 0),
                        Color.green);
 
+<<<<<<< Updated upstream
         // --- 落下かタイムオーバーでゲームオーバー判定 ---
-        if (!isGameOver && transform.position.y < fallThreshold && currentTime <= 0f)
+        if (!isGameOver && (transform.position.y < fallThreshold || currentTime <= 0f))
         {
             GameOver();
         }
@@ -306,6 +308,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+<<<<<<< Updated upstream
     private void UpdateTimerUI()
     {
         if (timerText != null)
@@ -316,6 +319,8 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+=======
+>>>>>>> Stashed changes
     private void GameOver()
     {
         isGameOver = true;
