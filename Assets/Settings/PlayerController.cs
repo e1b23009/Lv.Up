@@ -57,10 +57,22 @@ public class PlayerController : MonoBehaviour
     public GameObject gameOverUI; // Inspectorで割り当て（Canvas内のGameOverパネル）
     [SerializeField] private TextMeshProUGUI healthText; // Inspectorで割り当て
     [SerializeField] private TextMeshProUGUI timerText;
+    [SerializeField] private GameObject gameClearUI; // ゴール到達時に表示するUI
+
+    [Header("Game Clear")]
+    private bool isGameClear = false;
 
     [Header("Game Over")]
     public float fallThreshold = -10f;  // この高さを下回ったらゲームオーバー
     private bool isGameOver = false;
+
+    private int currentSelected = 0; // 0:リスタート, 1:タイトル
+    [SerializeField] private Button restartButton;
+    [SerializeField] private Button titleButton;
+
+    [Header("Color")]
+    [SerializeField] private Color normalColor = Color.white;     // 通常色
+    [SerializeField] private Color selectedColor = Color.yellow;  // 選択中の色
 
     void Start()
     {
@@ -74,6 +86,9 @@ public class PlayerController : MonoBehaviour
 
         if (gameOverUI != null)
             gameOverUI.SetActive(false); // 開始時は非表示
+
+        if(gameClearUI != null) 
+            gameClearUI.SetActive(false);
 
         // Visualを取得（インスペクタで未設定なら子から探す）
         if (visual == null)
@@ -119,7 +134,7 @@ public class PlayerController : MonoBehaviour
                        groundCheck.position + new Vector3(groundCheckSize.x / 2, 0, 0),
                        Color.green);
 
-        // --- 落下でゲームオーバー判定 ---
+        // --- 落下か時間切れでゲームオーバー判定 ---
         if (!isGameOver && (transform.position.y < fallThreshold || currentTime <= 0f))
         {
             GameOver();
@@ -220,6 +235,36 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
+
+        // --- ゲームクリア時にタイトルに戻る ---
+        if (isGameClear)
+        {
+            if (Input.GetKeyDown(KeyCode.Return))
+            {
+                ReturnToTitle();
+            }
+        }
+
+        // --- ゲームオーバー時にメニュー選択 ---
+        if (isGameOver)
+        {
+            // ↑ / ↓ キーで選択切り替え
+            if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+            {
+                SelectRestartButton();
+            }
+            else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
+            {
+                SelectTitleButton();
+            }
+
+            // Enterキーで決定
+            if (Input.GetKeyDown(KeyCode.Return))
+            {
+                if (currentSelected == 0) Restart();
+                else ReturnToTitle();
+            }
+        }
     }
 
     // --- しゃがみ開始 ---
@@ -288,8 +333,19 @@ public class PlayerController : MonoBehaviour
         {
             moveGroundSpeed = 0f;
         }
-
     }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (isGameOver || isGameClear) return; // ゲームオーバーやゲームクリア時は何もしない
+
+        // ゴールに触れたらゲームクリア
+        if (other.CompareTag("Goal")) // ゴールタグが設定されたオブジェクトに触れる
+        {
+            GameClear();
+        }
+    }
+
 
     // Spriteの透明度を変更する関数
     private void SetTransparency(float alpha)
@@ -317,6 +373,28 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void GameClear()
+    {
+        isGameClear = true;
+
+        if (gameClearUI != null)
+            gameClearUI.SetActive(true);
+
+        rb.linearVelocity = Vector2.zero;
+        rb.simulated = false;
+
+        Time.timeScale = 0f; // 全停止
+    }
+
+    public void ReturnToTitle()
+    {
+        // 時間を再開（止めていた場合）
+        Time.timeScale = 1f;
+
+        // タイトルシーンに移動
+        SceneManager.LoadScene("MainMenu");
+    }
+
     private void GameOver()
     {
         isGameOver = true;
@@ -332,6 +410,13 @@ public class PlayerController : MonoBehaviour
 
         // ゲーム全体を止める（物理・アニメーション・Update が止まる）
         Time.timeScale = 0f;
+
+        // --- ゲームオーバーUI表示 ---
+        if (gameOverUI != null)
+        {
+            gameOverUI.SetActive(true);
+            SelectRestartButton(); // ← 最初は「リスタート」選択状態に
+        }
     }
 
     public void Restart()
@@ -341,5 +426,29 @@ public class PlayerController : MonoBehaviour
 
         // ゲームを再開
         Time.timeScale = 1f;
+    }
+
+    private void SelectRestartButton()
+    {
+        currentSelected = 0;
+        restartButton.Select();
+
+        // 色変更
+        var restartImage = restartButton.GetComponent<Image>();
+        var titleImage = titleButton.GetComponent<Image>();
+        if (restartImage != null) restartImage.color = selectedColor;
+        if (titleImage != null) titleImage.color = normalColor;
+    }
+
+    private void SelectTitleButton()
+    {
+        currentSelected = 1;
+        titleButton.Select();
+
+        // 色変更
+        var restartImage = restartButton.GetComponent<Image>();
+        var titleImage = titleButton.GetComponent<Image>();
+        if (restartImage != null) restartImage.color = normalColor;
+        if (titleImage != null) titleImage.color = selectedColor;
     }
 }
