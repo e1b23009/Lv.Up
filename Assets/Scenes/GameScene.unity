@@ -851,7 +851,7 @@ Transform:
   m_GameObject: {fileID: 1024838112}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2, y: 5, z: 0}
+  m_LocalPosition: {x: 2, y: 2.4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1109,12 +1109,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1121804346}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f9a07ee79f1cb394380332b2acc9fbea, type: 3}
+  m_Script: {fileID: 11500000, guid: 0fddae3787a7ed844ad5a6cbc82c817b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
-  damage: 1
+  m_EditorClassIdentifier: Assembly-CSharp::Boss
+  damage: 3
   moveSpeed: 2
-  detectRadius: 10
+  detectRadius: 12
+  coolTime: 15
 --- !u!1 &1259391293
 GameObject:
   m_ObjectHideFlags: 0

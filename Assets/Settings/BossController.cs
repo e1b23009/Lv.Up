@@ -1,4 +1,5 @@
 using System.Diagnostics;
+//using System.Numerics;
 using UnityEngine;
 
 public class Boss : MonoBehaviour, IEnemyStatus
@@ -6,6 +7,8 @@ public class Boss : MonoBehaviour, IEnemyStatus
     public int damage = 3;
     public float moveSpeed = 2f;
     public float detectRadius = 12f;
+    public float elasticity = 2f; // ジャンプ攻撃時の伸縮性
+
 
     public int Damage { get; set; }
     public float MoveSpeed { get; set; }
@@ -20,8 +23,11 @@ public class Boss : MonoBehaviour, IEnemyStatus
 
     private Rigidbody2D rb;
     private Transform player;
+    private SpriteRenderer sr;
+    private Vector3 originalScale;
 
     private bool isGrounded = false;
+    private int groundContactCount = 0;
 
     void Start()
     {
@@ -30,6 +36,9 @@ public class Boss : MonoBehaviour, IEnemyStatus
         DetectRadius = detectRadius;
 
         rb = GetComponent<Rigidbody2D>();
+
+        sr = GetComponent<SpriteRenderer>(); // 追加
+        originalScale = transform.localScale; // 追加
 
         // �v���C���[�ƕ����Փ˂𖳎�����
         GameObject playerObj = GameObject.FindWithTag("Player");
@@ -69,7 +78,7 @@ public class Boss : MonoBehaviour, IEnemyStatus
                 //クールタイムが0かつ、攻撃中でないとき
                 if (coolTimer <= 0 && isAttacking == false)
                 {
-                    attack_id = UnityEngine.Random.Range(0, 1); //攻撃方法の抽選(0しかでない)
+                    attack_id = UnityEngine.Random.Range(0, 1); //攻撃方法の抽選
 
                     //ジャンプ攻撃のとき
                     if (attack_id == 0)
@@ -77,18 +86,20 @@ public class Boss : MonoBehaviour, IEnemyStatus
                         //地面の上にいるかつ、ジャンプしてないとき
                         if (isGrounded && !isJumped)
                         {
-                            UnityEngine.Vector2 targetPos = new UnityEngine.Vector2(player.position.x, player.position.y + 100f); // プレイヤーの頭上をターゲット設定
-                            UnityEngine.Vector2 dir = (targetPos - (UnityEngine.Vector2)transform.position).normalized; // ベクトルを設定
+                            //rb.AddForce(Vector2.up * 10, ForceMode2D.Impulse); // ジャンプする
+                            UnityEngine.Vector2 targetPos = new UnityEngine.Vector2(player.position.x, player.position.y + 100f);
+                            UnityEngine.Vector2 dir = (targetPos - (UnityEngine.Vector2)transform.position).normalized;
                             dir.x *= 3.5f;
-                            rb.AddForce(dir * 10f, ForceMode2D.Impulse); // ジャンプする
+                            rb.AddForce(dir * 10f, ForceMode2D.Impulse);
 
                             isAttacking = true; // 攻撃フラグ
                             isJumped = true; // ジャンプフラグを立てる
+                            isGrounded = false;
                         }
                     }
                 }
             }
-            else if (isGrounded) //クールタイム中、地面の上にいるときに移動可能な状態になる
+            else if (isGrounded) //クールタイム中、地面の上にいるときに移動する
             {
                 Vector2 targetPos = new Vector2(player.position.x, rb.position.y); // y�͕ς��Ȃ�
                 Vector2 newPos = Vector2.MoveTowards(rb.position, targetPos, moveSpeed * Time.fixedDeltaTime);
@@ -106,23 +117,28 @@ public class Boss : MonoBehaviour, IEnemyStatus
                 if (isJumped)
                 {
                     isJumped = false;
-                    attackTimer = 2f; // 攻撃時間を2秒とする
+                    attackTimer = 1.5f; // 攻撃時間を1.5秒とする
                 }
-                //着地してから2秒以内の場合
+                //着地してから1.5秒以内の場合
                 else if (attackTimer > 0)
                 {
                     attackTimer -= Time.deltaTime;
 
-                    // 2秒経過した場合
+                    float scaleFactor = 1.0f + Mathf.Sin((1.5f - attackTimer)) * elasticity;
+                    transform.localScale = new Vector3(originalScale.x * scaleFactor, originalScale.y / scaleFactor, originalScale.z);
+                    transform.position = new Vector2(rb.position.x, rb.position.y - 0.1f);
+
+                    // 2秒過ぎた場合
                     if (attackTimer <= 0)
                     {
-                        // 攻撃終了
-                        isAttacking = false;
+                        transform.localScale = originalScale; // 元に戻す
+                        isAttacking = false; // 攻撃終了
                         //クールタイムリセット
                         coolTimer = coolTime;
 
                     }
                 }
+
             }
 
         }
@@ -134,6 +150,7 @@ public class Boss : MonoBehaviour, IEnemyStatus
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
+            groundContactCount++;
             isGrounded = true;
         }
     }
@@ -142,7 +159,12 @@ public class Boss : MonoBehaviour, IEnemyStatus
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
-            isGrounded = false;
+            groundContactCount--;
+            if (groundContactCount <= 0)
+            {
+                groundContactCount = 0;
+                isGrounded = false;
+            }
         }
     }
 

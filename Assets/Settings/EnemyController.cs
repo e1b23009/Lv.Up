@@ -13,9 +13,14 @@ public class Enemy : MonoBehaviour,IEnemyStatus
     private Rigidbody2D rb;
     private Transform player;
     private bool isGrounded = false;
+    private int groundContactCount = 0;
 
     void Start()
     {
+        Damage = damage;
+        MoveSpeed = moveSpeed;
+        DetectRadius = detectRadius;
+
         rb = GetComponent<Rigidbody2D>();
 
         // �v���C���[�ƕ����Փ˂𖳎�����
@@ -53,6 +58,7 @@ public class Enemy : MonoBehaviour,IEnemyStatus
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
+            groundContactCount++;
             isGrounded = true;
         }
     }
@@ -61,7 +67,12 @@ public class Enemy : MonoBehaviour,IEnemyStatus
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
-            isGrounded = false;
+            groundContactCount--;
+            if (groundContactCount <= 0)
+            {
+                groundContactCount = 0;
+                isGrounded = false;
+            }
         }
     }
 }
