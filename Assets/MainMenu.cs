@@ -1,79 +1,137 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System.Collections;
 
 public class MainMenu : MonoBehaviour
 {
     [SerializeField] private Button startButton;   // Startボタン
+    [SerializeField] private Button quitButton;    // Quitボタン
     [SerializeField] private Image fadePanel;      // フェード用黒パネル
 
     private void Start()
     {
-        // Startボタンにクリックイベントを登録
+        // Startボタン設定
         if (startButton != null)
             startButton.onClick.AddListener(OnStartGame);
 
-        // フェードパネルが設定されている場合
+        // Quitボタン設定
+        if (quitButton != null)
+            quitButton.onClick.AddListener(OnQuitGame);
+
+        // 起動時フェードイン
         if (fadePanel != null)
         {
-            // 起動時は黒パネルを表示しておきフェードイン開始
             fadePanel.gameObject.SetActive(true);
             Color c = fadePanel.color;
             c.a = 1f;
             fadePanel.color = c;
-
             StartCoroutine(FadeIn());
+        }
+
+        if (startButton != null)
+        {
+            EventSystem.current.SetSelectedGameObject(startButton.gameObject);
         }
     }
 
+    // ボタン移動音を鳴らす
+    public AudioSource uiAudio;
+    public AudioClip moveSound, decideSound;
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow))
+            uiAudio.PlayOneShot(moveSound);
+
+        if (Input.GetKeyDown(KeyCode.Return))
+            uiAudio.PlayOneShot(decideSound);
+    }
+
     /// <summary>
-    /// ゲーム開始時の処理（フェードアウト→シーン遷移）
+    /// Startボタンを押したとき
     /// </summary>
     private void OnStartGame()
     {
         Debug.Log("Start button clicked!");
-        if (fadePanel != null)
-            StartCoroutine(FadeOutAndLoad());
-        else
-            SceneManager.LoadScene("GameScene"); // フェードパネル未設定でも遷移可能
+        StartCoroutine(FadeOutAndLoad());
     }
 
     /// <summary>
-    /// タイトル起動時のフェードイン（黒→透明）
+    /// Quitボタンを押したとき
+    /// </summary>
+    private void OnQuitGame()
+    {
+        Debug.Log("Quit Game!");
+        StartCoroutine(FadeOutAndQuit());
+    }
+
+    /// <summary>
+    /// 起動時のフェードイン（黒→透明）
     /// </summary>
     private IEnumerator FadeIn()
     {
-        float t = 1f;
+        fadePanel.gameObject.SetActive(true);
+
+        float fadeTime = 1.2f; // 明転にかける時間（秒）
+        float elapsed = 0f;
         Color c = fadePanel.color;
-        while (t > 0f)
+
+        while (elapsed < fadeTime)
         {
-            t -= Time.deltaTime;       // フェード時間は1秒
-            c.a = Mathf.Clamp01(t);
+            elapsed += Time.deltaTime;
+            c.a = Mathf.Lerp(1f, 0f, elapsed / fadeTime); // αを1→0へ
             fadePanel.color = c;
             yield return null;
         }
 
+        // 最後に確実に透明にして消す
+        c.a = 0f;
+        fadePanel.color = c;
         fadePanel.gameObject.SetActive(false);
     }
 
     /// <summary>
-    /// ゲーム開始時のフェードアウト（透明→黒）→GameSceneへ
+    /// ゲーム開始時のフェードアウト（透明→黒）
     /// </summary>
     private IEnumerator FadeOutAndLoad()
     {
         fadePanel.gameObject.SetActive(true);
-        float t = 0f;
         Color c = fadePanel.color;
-
+        float t = 0f;
         while (t < 1f)
         {
-            t += Time.deltaTime;       // フェード時間は1秒
-            c.a = Mathf.Clamp01(t);
+            t += Time.deltaTime;
+            c.a = t;
+            fadePanel.color = c;
+            yield return null;
+        }
+        SceneManager.LoadScene("GameScene");
+    }
+
+    /// <summary>
+    /// 終了時のフェードアウト処理
+    /// </summary>
+    private IEnumerator FadeOutAndQuit()
+    {
+        fadePanel.gameObject.SetActive(true);
+        Color c = fadePanel.color;
+        float t = 0f;
+        while (t < 1f)
+        {
+            t += Time.deltaTime;
+            c.a = t;
             fadePanel.color = c;
             yield return null;
         }
 
-        SceneManager.LoadScene("GameScene");
+        // アプリ終了
+        Application.Quit();
+
+#if UNITY_EDITOR
+        // Unityエディタ上では再生停止
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
     }
 }
