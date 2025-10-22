@@ -77,7 +77,6 @@ public class GameUIManager : MonoBehaviour
         if (isGameClear) return;
 
         isGameClear = true;
-        Time.timeScale = 0f;
 
         if (gameClearUI != null)
             gameClearUI.SetActive(true);
@@ -89,7 +88,6 @@ public class GameUIManager : MonoBehaviour
         if (isGameOver) return;
 
         isGameOver = true;
-        Time.timeScale = 0f;
 
         if (gameOverUI != null)
         {
