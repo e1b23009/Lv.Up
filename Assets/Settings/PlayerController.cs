@@ -91,6 +91,16 @@ public class PlayerController : MonoBehaviour
 
         originalColSize = col.size;
         originalColOffset = col.offset;
+
+        if (uiManager == null)
+        {
+            Debug.LogError("uiManager がアサインされていません。CanvasをPlayerのUiManager欄にドラッグしてください。");
+        }
+        else
+        {
+            Debug.Log("uiManager が接続されています。");
+        }
+
     }
 
     void Update()
@@ -244,24 +254,33 @@ public class PlayerController : MonoBehaviour
     //棚橋君の追加コード
     private void HandleEnemyCollision()
     {
+        if (isGameOver || isGameClear) return;
+
         GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
         foreach (GameObject enemy in enemies)
         {
             Collider2D enemyCol = enemy.GetComponent<Collider2D>();
-            if (enemyCol == null) continue;
-
-            if (col.IsTouching(enemyCol) && invincibleTimer <= 0f)
+            if (enemyCol != null)
             {
-                currentHealth -= enemy.GetComponent<IEnemyStatus>().Damage;
-                uiManager?.UpdateHealthUI(currentHealth, maxHealth);
-
-                if (currentHealth <= 0)
-                {
-                    GameOver();
-                    return;
+                // OverlapColliderで重なっているかを検知
+                ContactFilter2D filter = new ContactFilter2D();
+                Collider2D[] results = new Collider2D[1];
+                int count = col.Overlap(filter.NoFilter(), results);
+                for (int i = 0; i < count; i++) 
+                { 
+                    if (results[i] == enemyCol && invincibleTimer <= 0f) 
+                    { 
+                        currentHealth -= enemy.GetComponent<IEnemyStatus>().Damage; 
+                        Debug.Log("体力: " + currentHealth);
+                        uiManager?.UpdateHealthUI(currentHealth, maxHealth);
+                        if (currentHealth <= 0) 
+                        { 
+                            GameOver();
+                            return;
+                        } 
+                        invincibleTimer = invincibleTime; 
+                    } 
                 }
-
-                invincibleTimer = invincibleTime;
             }
         }
     }
@@ -273,6 +292,12 @@ public class PlayerController : MonoBehaviour
         c.a = alpha;
         sr.color = c;
     }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        Debug.Log("何かに衝突しました: " + collision.gameObject.name);
+    }
+
 
     private void OnCollisionStay2D(Collision2D collision)
     {
@@ -313,6 +338,8 @@ public class PlayerController : MonoBehaviour
         rb.linearVelocity = Vector2.zero;
         rb.simulated = false;
 
+        Time.timeScale = 0f;
+
         // --- UI側に通知 ---
         uiManager?.GameOver();
     }
@@ -324,6 +351,8 @@ public class PlayerController : MonoBehaviour
 
         rb.linearVelocity = Vector2.zero;
         rb.simulated = false;
+        
+        Time.timeScale = 0f;
 
         // --- UI側に通知 ---
         uiManager?.GameClear();
