@@ -91,6 +91,16 @@ public class PlayerController : MonoBehaviour
 
         originalColSize = col.size;
         originalColOffset = col.offset;
+
+        if (uiManager == null)
+        {
+            Debug.LogError("uiManager がアサインされていません。CanvasをPlayerのUiManager欄にドラッグしてください。");
+        }
+        else
+        {
+            Debug.Log("uiManager が接続されています。");
+        }
+
     }
 
     void Update()
@@ -280,6 +290,12 @@ public class PlayerController : MonoBehaviour
         sr.color = c;
     }
 
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        Debug.Log("何かに衝突しました: " + collision.gameObject.name);
+    }
+
+
     private void OnCollisionStay2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("MoveGround"))
@@ -319,6 +335,8 @@ public class PlayerController : MonoBehaviour
         rb.linearVelocity = Vector2.zero;
         rb.simulated = false;
 
+        Time.timeScale = 0f;
+
         // --- UI側に通知 ---
         uiManager?.GameOver();
     }
@@ -330,6 +348,8 @@ public class PlayerController : MonoBehaviour
 
         rb.linearVelocity = Vector2.zero;
         rb.simulated = false;
+        
+        Time.timeScale = 0f;
 
         // --- UI側に通知 ---
         uiManager?.GameClear();
