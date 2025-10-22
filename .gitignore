@@ -97,3 +97,7 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# TextMeshPro generated SDF font assets (too large to track)
+Assets/TextMesh Pro/**/*.asset
+Assets/TextMesh Pro/**/*.png
