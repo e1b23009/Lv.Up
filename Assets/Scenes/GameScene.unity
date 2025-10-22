@@ -505,6 +505,7 @@ MonoBehaviour:
   damage: 3
   moveSpeed: 2
   detectRadius: 12
+  elasticity: 2
   coolTime: 15
 --- !u!50 &460807666
 Rigidbody2D:
@@ -1116,7 +1117,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u30BF\u30A4\u30C8\u30EB\u306B\u623B\u308B"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 39260df765b036c43b37a3d5fb4a9273, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2ee91c8365f941942a8615d0bac4037d, type: 2}
   m_sharedMaterial: {fileID: -3122412311481865529, guid: 39260df765b036c43b37a3d5fb4a9273, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -1405,7 +1406,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u30EA\u30B9\u30BF\u30FC\u30C8"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 39260df765b036c43b37a3d5fb4a9273, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2ee91c8365f941942a8615d0bac4037d, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -1735,7 +1736,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u30BF\u30A4\u30C8\u30EB\u306B\u623B\u308B"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 39260df765b036c43b37a3d5fb4a9273, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2ee91c8365f941942a8615d0bac4037d, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
