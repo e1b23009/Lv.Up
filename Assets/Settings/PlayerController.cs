@@ -244,25 +244,31 @@ public class PlayerController : MonoBehaviour
     //棚橋君の追加コード
     private void HandleEnemyCollision()
     {
-        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-        foreach (GameObject enemy in enemies)
+        if (isGameOver || isGameClear) return;
+
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy"); foreach (GameObject enemy in enemies)
         {
-            Collider2D enemyCol = enemy.GetComponent<Collider2D>();
-            if (enemyCol == null) continue;
-
-            if (col.IsTouching(enemyCol) && invincibleTimer <= 0f)
-            {
-                currentHealth -= enemy.GetComponent<IEnemyStatus>().Damage;
-                uiManager?.UpdateHealthUI(currentHealth, maxHealth);
-
-                if (currentHealth <= 0)
-                {
-                    GameOver();
-                    return;
-                }
-
-                invincibleTimer = invincibleTime;
-            }
+            Collider2D enemyCol = enemy.GetComponent<Collider2D>(); if (enemyCol != null)
+            { // OverlapColliderで重なっているかを検知
+              ContactFilter2D filter = new ContactFilter2D(); 
+                Collider2D[] results = new Collider2D[1]; 
+                int count = col.Overlap(filter.NoFilter(), results); 
+                for (int i = 0; i < count; i++) 
+                { 
+                    if (results[i] == enemyCol && invincibleTimer <= 0f)
+                    { 
+                        currentHealth -= enemy.GetComponent<IEnemyStatus>().Damage;
+                        Debug.Log("体力: " + currentHealth);
+                        uiManager?.UpdateHealthUI(currentHealth, maxHealth);
+                        if (currentHealth <= 0) 
+                        { 
+                            GameOver(); 
+                            return;
+                        } 
+                        invincibleTimer = invincibleTime;
+                    } 
+                } 
+            } 
         }
     }
 
