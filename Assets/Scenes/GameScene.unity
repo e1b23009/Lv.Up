@@ -927,26 +927,17 @@ MonoBehaviour:
   invincibleTime: 1
   moveSpeed: 5
   dashSpeed: 10
-  jumpForce: 7
+  jumpForce: 8
   crouchSpeed: 2.5
   crouchHeightRatio: 0.5
   visual: {fileID: 0}
   groundCheck: {fileID: 1356097060}
   groundCheckSize: {x: 0.9, y: 0.1}
-  groundCheckDistance: 0.1
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
-  startTime: 60
-  gameOverUI: {fileID: 24713091}
-  healthText: {fileID: 1395364720}
-  timerText: {fileID: 1426466394}
-  gameClearUI: {fileID: 806286837}
   fallThreshold: -3
-  restartButton: {fileID: 959876985}
-  titleButton: {fileID: 765344497}
-  normalColor: {r: 1, g: 1, b: 1, a: 1}
-  selectedColor: {r: 0.9308176, g: 0.06732321, b: 0.06732321, a: 1}
+  uiManager: {fileID: 1893678547}
 --- !u!61 &701981151
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2406,8 +2397,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 64
-  m_fontSizeBase: 64
+  m_fontSize: 50
+  m_fontSizeBase: 50
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -2465,17 +2456,17 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1395364718}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1893678546}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 1280, y: 720}
-  m_SizeDelta: {x: 2560, y: 1440}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 270, y: -50}
+  m_SizeDelta: {x: 500, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1426466392
 GameObject:
@@ -2542,8 +2533,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 64
-  m_fontSizeBase: 64
+  m_fontSize: 50
+  m_fontSizeBase: 50
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -2601,17 +2592,17 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1426466392}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1893678546}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 1280, y: 720}
-  m_SizeDelta: {x: 2560, y: 1440}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -270, y: -50}
+  m_SizeDelta: {x: 500, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1445307065
 GameObject:
@@ -2841,6 +2832,7 @@ GameObject:
   - component: {fileID: 1893678545}
   - component: {fileID: 1893678544}
   - component: {fileID: 1893678543}
+  - component: {fileID: 1893678547}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -2898,8 +2890,8 @@ Canvas:
   m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 1
-  m_Camera: {fileID: 0}
-  m_PlaneDistance: 100
+  m_Camera: {fileID: 519420031}
+  m_PlaneDistance: 10
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
@@ -2934,6 +2926,27 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1893678547
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1893678542}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c384a9046aca24a47845a5c75713096a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameUIManager
+  healthText: {fileID: 1395364720}
+  timerText: {fileID: 1426466394}
+  gameOverUI: {fileID: 24713091}
+  gameClearUI: {fileID: 806286837}
+  restartButton: {fileID: 959876985}
+  titleButton: {fileID: 765344497}
+  startTime: 60
+  normalColor: {r: 1, g: 1, b: 1, a: 1}
+  selectedColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!1 &1914666800
 GameObject:
   m_ObjectHideFlags: 0
