@@ -42,53 +42,34 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private Transform groundCheck;
     [SerializeField] private Vector2 groundCheckSize = new Vector2(1f, 0.1f);
-    [SerializeField] private float groundCheckDistance = 0.1f;
     [SerializeField] private LayerMask groundLayer;
 
     private float moveGroundSpeed = 0f;             //移動床の速度
 
     private Vector3 spawnPoint;                     // 開始位置
-
-    [Header("Timer Settings")]
-    public float startTime = 60f; // 制限時間（秒）
     private float currentTime;
-
-    [Header("UI")]
-    public GameObject gameOverUI; // Inspectorで割り当て（Canvas内のGameOverパネル）
-    [SerializeField] private TextMeshProUGUI healthText; // Inspectorで割り当て
-    [SerializeField] private TextMeshProUGUI timerText;
-    [SerializeField] private GameObject gameClearUI; // ゴール到達時に表示するUI
-
-    [Header("Game Clear")]
+    private bool isGameOver = false;
     private bool isGameClear = false;
 
     [Header("Game Over")]
     public float fallThreshold = -10f;  // この高さを下回ったらゲームオーバー
-    private bool isGameOver = false;
 
-    private int currentSelected = 0; // 0:リスタート, 1:タイトル
-    [SerializeField] private Button restartButton;
-    [SerializeField] private Button titleButton;
-
-    [Header("Color")]
-    [SerializeField] private Color normalColor = Color.white;     // 通常色
-    [SerializeField] private Color selectedColor = Color.yellow;  // 選択中の色
+    // GameUIManager への参照
+    [SerializeField] private GameUIManager uiManager;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<BoxCollider2D>();
-        currentHealth = maxHealth; // ゲーム開始時は全快
-        UpdateHealthUI();
-        spawnPoint = transform.position; // 開始位置を記録
-        currentTime = startTime;
-        UpdateTimerUI();
 
-        if (gameOverUI != null)
-            gameOverUI.SetActive(false); // 開始時は非表示
+        // 体力・時間初期化
+        currentHealth = maxHealth;
+        spawnPoint = transform.position;
+        currentTime = uiManager != null ? uiManager.StartTime : 60f;
 
-        if(gameClearUI != null) 
-            gameClearUI.SetActive(false);
+        // 初期UI表示
+        uiManager?.UpdateHealthUI(currentHealth, maxHealth);
+        uiManager?.UpdateTimerUI(currentTime);
 
         // Visualを取得（インスペクタで未設定なら子から探す）
         if (visual == null)
@@ -114,12 +95,6 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        Debug.Log("体力: " + currentHealth);
-
-        // --- タイマー減少 ---
-        currentTime -= Time.deltaTime;
-        UpdateTimerUI();
-
         // --- 接地判定を毎フレーム更新 ---
         // OverlapBox で足元に床があるか確認
         isGrounded = Physics2D.OverlapBox(
@@ -129,16 +104,22 @@ public class PlayerController : MonoBehaviour
             groundLayer
         );
 
-        // デバッグ可視化
-        Debug.DrawLine(groundCheck.position + new Vector3(-groundCheckSize.x / 2, 0, 0),
-                       groundCheck.position + new Vector3(groundCheckSize.x / 2, 0, 0),
-                       Color.green);
-
-        // --- 落下か時間切れでゲームオーバー判定 ---
-        if (!isGameOver && (transform.position.y < fallThreshold || currentTime <= 0f))
+        // --- タイマー処理 ---
+        currentTime -= Time.deltaTime;
+        uiManager?.UpdateTimerUI(currentTime);
+        if (currentTime <= 0f)
         {
             GameOver();
+            return;
         }
+
+        // --- 落下によるゲームオーバー判定 ---
+        if (!isGameOver && transform.position.y < fallThreshold)
+        {
+            GameOver();
+            return;
+        }
+
 
         // 入力
         float move = Input.GetAxisRaw("Horizontal"); // -1,0,1
@@ -187,10 +168,10 @@ public class PlayerController : MonoBehaviour
             }
             else if (isCrouching)
             {
-                jumpPower *= 0.6f;
+                jumpPower *= 0.8f;
             }
 
-                rb.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
+            rb.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
         }
 
         //棚橋君の追加コード
@@ -208,63 +189,9 @@ public class PlayerController : MonoBehaviour
             SetTransparency(1f);
         }
 
-        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-        foreach (GameObject enemy in enemies)
-        {
-            Collider2D enemyCol = enemy.GetComponent<Collider2D>();
-            if (enemyCol != null)
-            {
-                // OverlapColliderで重なっているかを検知
-                ContactFilter2D filter = new ContactFilter2D();
-                Collider2D[] results = new Collider2D[1];
-                int count = col.Overlap(filter.NoFilter(), results);
+        // --- 敵との接触判定 ---
+        HandleEnemyCollision();
 
-                for (int i = 0; i < count; i++)
-                {
-                    if (results[i] == enemyCol && invincibleTimer <= 0f)
-                    {
-                        currentHealth -= enemy.GetComponent<IEnemyStatus>().Damage;
-                        Debug.Log("体力: " + currentHealth);
-                        UpdateHealthUI();
-                        if (currentHealth <= 0)
-                        {
-                            GameOver();
-                        }
-                        invincibleTimer = invincibleTime;
-                    }
-                }
-            }
-        }
-
-        // --- ゲームクリア時にタイトルに戻る ---
-        if (isGameClear)
-        {
-            if (Input.GetKeyDown(KeyCode.Return))
-            {
-                ReturnToTitle();
-            }
-        }
-
-        // --- ゲームオーバー時にメニュー選択 ---
-        if (isGameOver)
-        {
-            // ↑ / ↓ キーで選択切り替え
-            if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
-            {
-                SelectRestartButton();
-            }
-            else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
-            {
-                SelectTitleButton();
-            }
-
-            // Enterキーで決定
-            if (Input.GetKeyDown(KeyCode.Return))
-            {
-                if (currentSelected == 0) Restart();
-                else ReturnToTitle();
-            }
-        }
     }
 
     // --- しゃがみ開始 ---
@@ -315,6 +242,38 @@ public class PlayerController : MonoBehaviour
     }
 
     //棚橋君の追加コード
+    private void HandleEnemyCollision()
+    {
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        foreach (GameObject enemy in enemies)
+        {
+            Collider2D enemyCol = enemy.GetComponent<Collider2D>();
+            if (enemyCol == null) continue;
+
+            if (col.IsTouching(enemyCol) && invincibleTimer <= 0f)
+            {
+                currentHealth -= enemy.GetComponent<IEnemyStatus>().Damage;
+                uiManager?.UpdateHealthUI(currentHealth, maxHealth);
+
+                if (currentHealth <= 0)
+                {
+                    GameOver();
+                    return;
+                }
+
+                invincibleTimer = invincibleTime;
+            }
+        }
+    }
+
+    // Spriteの透明度を変更する関数
+    private void SetTransparency(float alpha)
+    {
+        Color c = sr.color;
+        c.a = alpha;
+        sr.color = c;
+    }
+
     private void OnCollisionStay2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("MoveGround"))
@@ -346,109 +305,28 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-
-    // Spriteの透明度を変更する関数
-    private void SetTransparency(float alpha)
+    private void GameOver()
     {
-        Color c = sr.color;
-        c.a = alpha;
-        sr.color = c;
-    }
-
-    void UpdateHealthUI()
-    {
-        if (healthText != null)
-        {
-            healthText.text = "HP: " + currentHealth.ToString();
-        }
-    }
-
-    private void UpdateTimerUI()
-    {
-        if (timerText != null)
-        {
-            int minutes = Mathf.FloorToInt(currentTime / 60f);
-            int seconds = Mathf.FloorToInt(currentTime % 60f);
-            timerText.text = $"TIME: {minutes:00}:{seconds:00}";
-        }
-    }
-
-    private void GameClear()
-    {
-        isGameClear = true;
-
-        if (gameClearUI != null)
-            gameClearUI.SetActive(true);
+        if (isGameOver) return;
+        isGameOver = true;
 
         rb.linearVelocity = Vector2.zero;
         rb.simulated = false;
 
-        Time.timeScale = 0f; // 全停止
+        // --- UI側に通知 ---
+        uiManager?.GameOver();
     }
 
-    public void ReturnToTitle()
+    private void GameClear()
     {
-        // 時間を再開（止めていた場合）
-        Time.timeScale = 1f;
+        if (isGameClear) return;
+        isGameClear = true;
 
-        // タイトルシーンに移動
-        SceneManager.LoadScene("MainMenu");
-    }
-
-    private void GameOver()
-    {
-        isGameOver = true;
-        Debug.Log("Game Over!");
-
-        // ゲームオーバーUIを表示
-        if (gameOverUI != null)
-            gameOverUI.SetActive(true);
-
-        // 動きを止める
         rb.linearVelocity = Vector2.zero;
-        rb.simulated = false; // Rigidbodyを一時停止
+        rb.simulated = false;
 
-        // ゲーム全体を止める（物理・アニメーション・Update が止まる）
-        Time.timeScale = 0f;
-
-        // --- ゲームオーバーUI表示 ---
-        if (gameOverUI != null)
-        {
-            gameOverUI.SetActive(true);
-            SelectRestartButton(); // ← 最初は「リスタート」選択状態に
-        }
+        // --- UI側に通知 ---
+        uiManager?.GameClear();
     }
 
-    public void Restart()
-    {
-        // UIを消す必要なし（シーン再ロードで勝手に初期化される）
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-
-        // ゲームを再開
-        Time.timeScale = 1f;
-    }
-
-    private void SelectRestartButton()
-    {
-        currentSelected = 0;
-        restartButton.Select();
-
-        // 色変更
-        var restartImage = restartButton.GetComponent<Image>();
-        var titleImage = titleButton.GetComponent<Image>();
-        if (restartImage != null) restartImage.color = selectedColor;
-        if (titleImage != null) titleImage.color = normalColor;
-    }
-
-    private void SelectTitleButton()
-    {
-        currentSelected = 1;
-        titleButton.Select();
-
-        // 色変更
-        var restartImage = restartButton.GetComponent<Image>();
-        var titleImage = titleButton.GetComponent<Image>();
-        if (restartImage != null) restartImage.color = normalColor;
-        if (titleImage != null) titleImage.color = selectedColor;
-    }
 }
