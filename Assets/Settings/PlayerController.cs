@@ -237,19 +237,42 @@ public class PlayerController : MonoBehaviour
     private void ExitCrouch()
     {
         if (col == null) return;
-        isCrouching = false;
 
-        // 当たり判定を元のサイズに戻す
-        col.size = originalColSize;
-        col.offset = originalColOffset;
-
-        // 見た目も元の状態に戻す
-        if (visual != null)
+        // 立ち上がったときに天井に当たるかどうかを確認
+        if (CanStandUp())
         {
-            visual.localScale = visualOrigScale;
-            visual.localPosition = visualOrigLocalPos;
+            isCrouching = false;
+
+            // 当たり判定を元のサイズに戻す
+            col.size = originalColSize;
+            col.offset = originalColOffset;
+
+            // 見た目も元の状態に戻す
+            if (visual != null)
+            {
+                visual.localScale = visualOrigScale;
+                visual.localPosition = visualOrigLocalPos;
+            }
+        }
+        else
+        {
+            // 立ち上がれなければしゃがみ続ける
+            Debug.Log("天井があるため立てません。しゃがみ姿勢を維持します。");
         }
     }
+
+    // --- 立てるかどうかを確認する関数 ---
+    private bool CanStandUp()
+    {
+        // 立ち上がるために必要なスペースがあるかを判定
+        Vector2 center = (Vector2)transform.position + originalColOffset;
+        Vector2 checkSize = originalColSize * 0.98f;  // 少し小さくして余裕を持たせる
+        Collider2D hit = Physics2D.OverlapBox(center, checkSize, 0f, groundLayer);
+
+        // 重なりがなければ立てる
+        return hit == null;
+    }
+
 
     //棚橋君の追加コード
     private void HandleEnemyCollision()
