@@ -26,6 +26,7 @@ public class PlayerController : MonoBehaviour
     [Range(0.2f, 1f)]
     public float crouchHeightRatio = 0.5f;          // しゃがみ中のコライダーの高さ比率 (0.2~1.0)
 
+    private int point = 0; // ポイント(アイテムを取ると上昇)
     private Rigidbody2D rb;
     private BoxCollider2D col;
     private bool isGrounded = false;
@@ -283,25 +284,51 @@ public class PlayerController : MonoBehaviour
         {
             Collider2D enemyCol = enemy.GetComponent<Collider2D>(); if (enemyCol != null)
             { // OverlapColliderで重なっているかを検知
-              ContactFilter2D filter = new ContactFilter2D(); 
-                Collider2D[] results = new Collider2D[1]; 
-                int count = col.Overlap(filter.NoFilter(), results); 
-                for (int i = 0; i < count; i++) 
-                { 
+                ContactFilter2D filter = new ContactFilter2D();
+                Collider2D[] results = new Collider2D[1];
+                int count = col.Overlap(filter.NoFilter(), results);
+                for (int i = 0; i < count; i++)
+                {
                     if (results[i] == enemyCol && invincibleTimer <= 0f)
-                    { 
+                    {
                         currentHealth -= enemy.GetComponent<IEnemyStatus>().Damage;
                         Debug.Log("体力: " + currentHealth);
                         uiManager?.UpdateHealthUI(currentHealth, maxHealth);
-                        if (currentHealth <= 0) 
-                        { 
-                            GameOver(); 
+                        if (currentHealth <= 0)
+                        {
+                            GameOver();
                             return;
-                        } 
+                        }
                         invincibleTimer = invincibleTime;
-                    } 
-                } 
-            } 
+                    }
+                }
+            }
+        }
+        
+        // アイテムとの接触判定
+        GameObject[] items = GameObject.FindGameObjectsWithTag("Item");
+        foreach (GameObject item in items)
+        {
+            Collider2D itemCol = item.GetComponent<Collider2D>();
+
+            if (itemCol != null)
+            {
+                // OverlapColliderで重なっているかを検知
+                ContactFilter2D filter = new ContactFilter2D();
+                Collider2D[] results = new Collider2D[10];
+                int count = col.Overlap(filter.NoFilter(), results);
+
+                for (int i = 0; i < count; i++)
+                {
+
+                    if (results[i] == itemCol)
+                    {
+                        point += item.GetComponent<Item>().point;
+                        Debug.Log("現在のポイント: " + point);
+                        Destroy(item);
+                    }
+                }
+            }
         }
     }
 
