@@ -26,6 +26,11 @@ public class PlayerController : MonoBehaviour
     [Range(0.2f, 1f)]
     public float crouchHeightRatio = 0.5f;          // しゃがみ中のコライダーの高さ比率 (0.2~1.0)
 
+    [Header("Projectile Settings")]
+    public GameObject projectilePrefab;  // 弾のプレハブ
+    public float projectileSpeed = 10f;  // 弾の速度
+    public Transform firePoint;          // 弾を発射する位置
+
     private int point = 0; // ポイント(アイテムを取ると上昇)
     private Rigidbody2D rb;
     private BoxCollider2D col;
@@ -185,6 +190,12 @@ public class PlayerController : MonoBehaviour
             rb.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
         }
 
+        // Qキーを押したときに弾を発射
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            FireProjectile();
+        }
+
         //棚橋君の追加コード
         // 無敵時間のカウントダウン
         if (invincibleTimer > 0)
@@ -274,6 +285,25 @@ public class PlayerController : MonoBehaviour
         return hit == null;
     }
 
+    // 弾を発射する処理
+    void FireProjectile()
+    {
+        if (projectilePrefab == null || firePoint == null) return;
+        // 弾を発射する位置から弾のインスタンスを生成
+        GameObject projectile = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
+
+        // 弾に速度を与える（Rigidbody2Dを使って発射する）
+        Rigidbody2D rb = projectile.GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            // 右向きなら右へ、左向きなら左へ発射
+            float direction = transform.localScale.x >= 0 ? 1f : -1f;
+            rb.linearVelocity = new Vector2(direction * projectileSpeed, 0f);
+        }
+
+        // 3秒後に自動で消す
+        Destroy(projectile, 3f);
+    }
 
     //棚橋君の追加コード
     private void HandleEnemyCollision()

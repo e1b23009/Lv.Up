@@ -9,6 +9,7 @@ TagManager:
   - Block
   - MoveGround
   - Goal
+  - Item
   layers:
   - Default
   - TransparentFX
