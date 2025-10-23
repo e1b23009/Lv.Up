@@ -3,34 +3,43 @@ using UnityEngine;
 public class Block : MonoBehaviour
 {
     private bool playerNearby = false;
+    // å‡ºç¾ã•ã›ã‚‹ã‚¢ã‚¤ãƒ†ãƒ ã®Prefabã‚’ã‚¤ãƒ³ã‚¹ãƒšã‚¯ã‚¿ã‹ã‚‰æŒ‡å®š
+    public GameObject itemPrefab;
 
-    // ƒvƒŒƒCƒ„[‚ªÕ“Ë‚µ‚½‚ç true
+    // ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Õ“Ë‚ï¿½ï¿½ï¿½ï¿½ï¿½ true
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Player"))
         {
             playerNearby = true;
-            Debug.Log("Player‚ª‹ß‚­‚É‚¢‚é");
+            Debug.Log("Playerï¿½ï¿½ï¿½ß‚ï¿½ï¿½É‚ï¿½ï¿½ï¿½");
         }
     }
 
-    // ƒvƒŒƒCƒ„[‚ª—£‚ê‚½‚ç false
+    // ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ï¿½ï¿½ false
     private void OnCollisionExit2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Player"))
         {
             playerNearby = false;
-            Debug.Log("Player‚ª—£‚ê‚½");
+            Debug.Log("Playerï¿½ï¿½ï¿½ï¿½ï¿½ê‚½");
         }
     }
 
     private void Update()
     {
-        // ƒvƒŒƒCƒ„[‚ª‹ß‚­‚É‚¢‚ÄAƒVƒtƒgƒL[‚ª‰Ÿ‚³‚ê‚½‚ç”j‰ó
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒè¿‘ãã«ã„ã¦ã€ã‚·ãƒ•ãƒˆã‚­ãƒ¼ãŒæŠ¼ã•ã‚ŒãŸã‚‰ç ´å£Š
         if (playerNearby && Input.GetKeyDown(KeyCode.LeftShift))
         {
+            // ã‚¢ã‚¤ãƒ†ãƒ ã‚’ç”Ÿæˆï¼ˆãƒ–ãƒ­ãƒƒã‚¯ã®ä½ç½®ã«å‡ºç¾ï¼‰
+            if (itemPrefab != null)
+            {
+                Instantiate(itemPrefab, transform.position, Quaternion.identity);
+                Debug.Log("ã‚¢ã‚¤ãƒ†ãƒ ã‚’å‡ºç¾ã•ã›ãŸ");
+            }
+            
             Destroy(gameObject);
-            Debug.Log("Block‚ğ”j‰ó‚µ‚½");
+            Debug.Log("Blockã‚’ç ´å£Šã—ãŸ");
         }
     }
 }
