@@ -2,9 +2,14 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour,IEnemyStatus
 {
-    public int damage = 1;
-    public float moveSpeed = 3f;    // �G�̈ړ����x
-    public float detectRadius = 10f; // �v���C���[���m�͈�
+    [Header("攻撃・AI設定")]
+    public int damage = 1;             // プレイヤーに与えるダメージ
+    public float moveSpeed = 3f;       // 移動速度
+    public float detectRadius = 10f;   // プレイヤーを検知する距離
+
+    [Header("体力設定")]
+    public int maxHealth = 3;          // 最大体力
+    private int currentHealth;         // 現在の体力
 
     public int Damage { get; set; }
     public float MoveSpeed { get; set; }
@@ -17,9 +22,11 @@ public class Enemy : MonoBehaviour,IEnemyStatus
 
     void Start()
     {
+        // ステータス初期化
         Damage = damage;
         MoveSpeed = moveSpeed;
         DetectRadius = detectRadius;
+        currentHealth = maxHealth;
 
         rb = GetComponent<Rigidbody2D>();
 
@@ -74,5 +81,23 @@ public class Enemy : MonoBehaviour,IEnemyStatus
                 isGrounded = false;
             }
         }
+    }
+
+    // === ここから追加部分 ===
+    public void TakeDamage(int amount)
+    {
+        currentHealth -= amount;
+        Debug.Log($"{gameObject.name} が {amount} ダメージを受けた！（残りHP: {currentHealth}）");
+
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        Debug.Log($"{gameObject.name} が倒れた！");
+        Destroy(gameObject);
     }
 }

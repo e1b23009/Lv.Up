@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour
     public float dashSpeed = 10f;                   // Shiftキー長押し中の移動速度
     // 空中速度維持用
     private float storedSpeed = 0f;
+    private int facingDirection = 1; // 1 = 右向き, -1 = 左向き
 
     [Header("Jump")]
     public float jumpForce = 8f;                    // ジャンプの推進力
@@ -173,6 +174,34 @@ public class PlayerController : MonoBehaviour
             rb.linearVelocity = new Vector2(move * currentSpeed, rb.linearVelocity.y);
         }
 
+        // --- プレイヤーの向きを更新 ---
+        if (move > 0)
+        {
+            facingDirection = 1;
+            visual.localScale = new Vector3(Mathf.Abs(visualOrigScale.x), visualOrigScale.y, visualOrigScale.z);
+
+            // FirePointも右側に配置
+            if (firePoint != null)
+            {
+                Vector3 pos = firePoint.localPosition;
+                pos.x = Mathf.Abs(pos.x);
+                firePoint.localPosition = pos;
+            }
+        }
+        else if (move < 0)
+        {
+            facingDirection = -1;
+            visual.localScale = new Vector3(-Mathf.Abs(visualOrigScale.x), visualOrigScale.y, visualOrigScale.z);
+
+            // FirePointも左側に配置
+            if (firePoint != null)
+            {
+                Vector3 pos = firePoint.localPosition;
+                pos.x = -Mathf.Abs(pos.x);
+                firePoint.localPosition = pos;
+            }
+        }
+
         // ジャンプ入力
         if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.W)) && isGrounded)
         {
@@ -289,20 +318,35 @@ public class PlayerController : MonoBehaviour
     void FireProjectile()
     {
         if (projectilePrefab == null || firePoint == null) return;
+
+        // --- 現在の弾の数を確認 ---
+        int currentBullets = GameObject.FindGameObjectsWithTag("Projectile").Length;
+        if (currentBullets >= 2)
+        {
+            Debug.Log("弾が上限に達しています。");
+            return; // 弾が2発以上あるなら発射しない
+        }
+
         // 弾を発射する位置から弾のインスタンスを生成
         GameObject projectile = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
+
+        // 自分との衝突を無視
+        Projectile p = projectile.GetComponent<Projectile>();
+        if (p != null)
+        {
+            p.SetShooter(GetComponent<Collider2D>());
+        }
 
         // 弾に速度を与える（Rigidbody2Dを使って発射する）
         Rigidbody2D rb = projectile.GetComponent<Rigidbody2D>();
         if (rb != null)
         {
             // 右向きなら右へ、左向きなら左へ発射
-            float direction = transform.localScale.x >= 0 ? 1f : -1f;
-            rb.linearVelocity = new Vector2(direction * projectileSpeed, 0f);
+            rb.linearVelocity = new Vector2(facingDirection * projectileSpeed, 0f);
         }
 
-        // 3秒後に自動で消す
-        Destroy(projectile, 3f);
+        // 1.5秒後に自動で消す
+        Destroy(projectile, 1.5f);
     }
 
     //棚橋君の追加コード
