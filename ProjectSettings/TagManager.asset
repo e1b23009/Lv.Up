@@ -10,6 +10,7 @@ TagManager:
   - MoveGround
   - Goal
   - Item
+  - Projectile
   layers:
   - Default
   - TransparentFX

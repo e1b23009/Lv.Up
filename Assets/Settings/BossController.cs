@@ -9,6 +9,9 @@ public class Boss : MonoBehaviour, IEnemyStatus
     public float detectRadius = 12f;
     public float elasticity = 2f; // ジャンプ攻撃時の伸縮性
 
+    [Header("体力設定")]
+    public int maxHealth = 10;
+    private int currentHealth;
 
     public int Damage { get; set; }
     public float MoveSpeed { get; set; }
@@ -34,6 +37,8 @@ public class Boss : MonoBehaviour, IEnemyStatus
         Damage = damage;
         MoveSpeed = moveSpeed;
         DetectRadius = detectRadius;
+
+        currentHealth = maxHealth;
 
         rb = GetComponent<Rigidbody2D>();
 
@@ -166,6 +171,24 @@ public class Boss : MonoBehaviour, IEnemyStatus
                 isGrounded = false;
             }
         }
+    }
+
+    public void TakeDamage(int amount)
+    {
+        currentHealth -= amount;
+        UnityEngine.Debug.Log($"Bossが{amount}ダメージを受けた！残りHP: {currentHealth}");
+
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        UnityEngine.Debug.Log("Bossを倒した！");
+        // 死亡アニメーションなどを後で追加可
+        Destroy(gameObject);
     }
 
 }
