@@ -11,6 +11,8 @@ public class Enemy : MonoBehaviour,IEnemyStatus
     public int maxHealth = 3;          // 最大体力
     private int currentHealth;         // 現在の体力
 
+    public int point = 10; // 倒したときにもらえるポイント
+
     public int Damage { get; set; }
     public float MoveSpeed { get; set; }
     public float DetectRadius { get; set; }
@@ -63,7 +65,7 @@ public class Enemy : MonoBehaviour,IEnemyStatus
     // �n�ʂƂ̐ڐG����i�^�O�Ŕ���j
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Ground"))
+        if (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Block") || collision.gameObject.CompareTag("MoveGround"))
         {
             groundContactCount++;
             isGrounded = true;
@@ -72,7 +74,7 @@ public class Enemy : MonoBehaviour,IEnemyStatus
 
     private void OnCollisionExit2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Ground"))
+        if (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Block") || collision.gameObject.CompareTag("MoveGround"))
         {
             groundContactCount--;
             if (groundContactCount <= 0)
@@ -98,6 +100,14 @@ public class Enemy : MonoBehaviour,IEnemyStatus
     private void Die()
     {
         Debug.Log($"{gameObject.name} が倒れた！");
+
+        // プレイヤーにポイント加算
+        PlayerController player = FindObjectOfType<PlayerController>();
+        if (player != null)
+        {
+            player.AddPoint(point);
+        }
+
         Destroy(gameObject);
     }
 }

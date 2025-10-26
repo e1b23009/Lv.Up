@@ -13,6 +13,8 @@ public class Boss : MonoBehaviour, IEnemyStatus
     public int maxHealth = 10;
     private int currentHealth;
 
+    public int point = 50; // 倒したときにもらえるポイント
+
     public int Damage { get; set; }
     public float MoveSpeed { get; set; }
     public float DetectRadius { get; set; }
@@ -187,7 +189,14 @@ public class Boss : MonoBehaviour, IEnemyStatus
     private void Die()
     {
         UnityEngine.Debug.Log("Bossを倒した！");
-        // 死亡アニメーションなどを後で追加可
+
+        // プレイヤーにポイント加算
+        PlayerController player = FindObjectOfType<PlayerController>();
+        if (player != null)
+        {
+            player.AddPoint(point);
+        }
+
         Destroy(gameObject);
     }
 
