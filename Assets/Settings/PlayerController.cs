@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement; // シーン制御用
+using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;              // UI表示用
 using static UnityEditor.PlayerSettings;
 
@@ -32,7 +33,7 @@ public class PlayerController : MonoBehaviour
     public float projectileSpeed = 10f;  // 弾の速度
     public Transform firePoint;          // 弾を発射する位置
 
-    private int point = 0; // ポイント(アイテムを取ると上昇)
+    private int Point = 0; // ポイント(アイテムを取ると上昇)
     private Rigidbody2D rb;
     private BoxCollider2D col;
     private bool isGrounded = false;
@@ -174,33 +175,61 @@ public class PlayerController : MonoBehaviour
             rb.linearVelocity = new Vector2(move * currentSpeed, rb.linearVelocity.y);
         }
 
-        // --- プレイヤーの向きを更新 ---
-        if (move > 0)
+        // --- プレイヤーの向きを更新（しゃがみ中はスケール変更しない） ---
+        if (!isCrouching)
         {
-            facingDirection = 1;
-            visual.localScale = new Vector3(Mathf.Abs(visualOrigScale.x), visualOrigScale.y, visualOrigScale.z);
-
-            // FirePointも右側に配置
-            if (firePoint != null)
+            if (move > 0)
             {
-                Vector3 pos = firePoint.localPosition;
-                pos.x = Mathf.Abs(pos.x);
-                firePoint.localPosition = pos;
+                facingDirection = 1;
+                visual.localScale = new Vector3(Mathf.Abs(visualOrigScale.x), visualOrigScale.y, visualOrigScale.z);
+
+                // FirePointも右側に配置
+                if (firePoint != null)
+                {
+                    Vector3 pos = firePoint.localPosition;
+                    pos.x = Mathf.Abs(pos.x);
+                    firePoint.localPosition = pos;
+                }
+            }
+            else if (move < 0)
+            {
+                facingDirection = -1;
+                visual.localScale = new Vector3(-Mathf.Abs(visualOrigScale.x), visualOrigScale.y, visualOrigScale.z);
+
+                // FirePointも左側に配置
+                if (firePoint != null)
+                {
+                    Vector3 pos = firePoint.localPosition;
+                    pos.x = -Mathf.Abs(pos.x);
+                    firePoint.localPosition = pos;
+                }
             }
         }
-        else if (move < 0)
+        else
         {
-            facingDirection = -1;
-            visual.localScale = new Vector3(-Mathf.Abs(visualOrigScale.x), visualOrigScale.y, visualOrigScale.z);
-
-            // FirePointも左側に配置
-            if (firePoint != null)
+            // しゃがみ中でも向きだけは変えたい場合（見た目は縮めたまま）
+            if (move > 0)
             {
-                Vector3 pos = firePoint.localPosition;
-                pos.x = -Mathf.Abs(pos.x);
-                firePoint.localPosition = pos;
+                facingDirection = 1;
+                if (firePoint != null)
+                {
+                    Vector3 pos = firePoint.localPosition;
+                    pos.x = Mathf.Abs(pos.x);
+                    firePoint.localPosition = pos;
+                }
+            }
+            else if (move < 0)
+            {
+                facingDirection = -1;
+                if (firePoint != null)
+                {
+                    Vector3 pos = firePoint.localPosition;
+                    pos.x = -Mathf.Abs(pos.x);
+                    firePoint.localPosition = pos;
+                }
             }
         }
+
 
         // ジャンプ入力
         if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.W)) && isGrounded)
@@ -397,8 +426,7 @@ public class PlayerController : MonoBehaviour
 
                     if (results[i] == itemCol)
                     {
-                        point += item.GetComponent<Item>().point;
-                        Debug.Log("現在のポイント: " + point);
+                        AddPoint(item.GetComponent<Item>().point);
                         Destroy(item);
                     }
                 }
@@ -477,6 +505,13 @@ public class PlayerController : MonoBehaviour
 
         // --- UI側に通知 ---
         uiManager?.GameClear();
+    }
+
+
+    public void AddPoint(int amount)
+    {
+        Point += amount;
+        Debug.Log("現在のポイント: " + Point);
     }
 
 }
