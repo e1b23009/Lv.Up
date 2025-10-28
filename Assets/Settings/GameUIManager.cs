@@ -8,6 +8,7 @@ public class GameUIManager : MonoBehaviour
     [Header("UI Elements")]
     [SerializeField] private TextMeshProUGUI healthText;
     [SerializeField] private TextMeshProUGUI timerText;
+    [SerializeField] private TextMeshProUGUI scoreText;
     [SerializeField] private GameObject gameOverUI;
     [SerializeField] private GameObject gameClearUI;
     [SerializeField] private Button restartButton;
@@ -24,11 +25,15 @@ public class GameUIManager : MonoBehaviour
     private bool isGameOver = false;
     private bool isGameClear = false;
     private int currentSelected = 0; // 0:リスタート, 1:タイトル
+    private int bestScore = 0; // 最高スコア
 
     private void Start()
     {
         gameOverUI?.SetActive(false);
         gameClearUI?.SetActive(false);
+
+        // 保存されたスコアを読み込む
+        bestScore = PlayerPrefs.GetInt("bestScore", 0); // "bestScore"がない場合は0に設定
 
         // ボタンイベント登録
         restartButton?.onClick.AddListener(Restart);
@@ -93,6 +98,31 @@ public class GameUIManager : MonoBehaviour
         {
             gameOverUI.SetActive(true);
             SelectRestartButton(); // 初期選択状態
+        }
+    }
+
+    // 最終スコアを表示するメソッド
+    public void DisplayFinalScore(int finalScore)
+    {
+        // ゲームオーバー画面やクリア画面で最終スコアを表示
+        if (gameOverUI != null || gameClearUI != null)
+        {
+            scoreText.text = $"最終スコア: {finalScore}";
+            
+            // 最終スコアを保存する処理
+            UpdateBestScore(finalScore);
+            Debug.Log($"bestScore:{bestScore}");
+        }
+    }
+
+    //最高スコアの更新
+    public void UpdateBestScore(int finalScore)
+    {
+        if(finalScore > bestScore)
+        {
+            bestScore = finalScore;
+            PlayerPrefs.SetInt("bestScore", bestScore); // bestScoreを保存
+            PlayerPrefs.Save(); // 保存
         }
     }
 

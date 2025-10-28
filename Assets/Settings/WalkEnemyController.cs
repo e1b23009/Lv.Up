@@ -1,9 +1,17 @@
+using System.Drawing;
 using UnityEngine;
 
 public class WalkEnemy : MonoBehaviour,IEnemyStatus
 {
-    public int damage = 1;
-    public float moveSpeed = 3f;    // �G�̈ړ����x
+    [Header("攻撃・AI設定")]
+    public int damage = 1;             // プレイヤーに与えるダメージ
+    public float moveSpeed = 3f;       // 移動速度
+
+    [Header("体力設定")]
+    public int maxHealth = 3;          // 最大体力
+    private int currentHealth;         // 現在の体力
+
+    public int point = 10; // 倒したときにもらえるポイント
 
     public int Damage { get; set; }
     public float MoveSpeed { get; set; }
@@ -20,6 +28,7 @@ public class WalkEnemy : MonoBehaviour,IEnemyStatus
         Damage = damage;
         MoveSpeed = moveSpeed;
         DetectRadius = 0;
+        currentHealth = maxHealth;
 
         rb = GetComponent<Rigidbody2D>();
 
@@ -64,7 +73,7 @@ public class WalkEnemy : MonoBehaviour,IEnemyStatus
     // �n�ʂƂ̐ڐG����i�^�O�Ŕ���j
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Ground"))
+        if (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Ground"))
         {
             groundContactCount++;
             isGrounded = true;
@@ -84,7 +93,7 @@ public class WalkEnemy : MonoBehaviour,IEnemyStatus
 
     private void OnCollisionExit2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Ground"))
+        if (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Enemy"))
         {
             groundContactCount--;
             if (groundContactCount <= 0)
@@ -93,5 +102,31 @@ public class WalkEnemy : MonoBehaviour,IEnemyStatus
                 isGrounded = false;
             }
         }
+    }
+
+    // === ここから追加部分 ===
+    public void TakeDamage(int amount)
+    {
+        currentHealth -= amount;
+        Debug.Log($"{gameObject.name} が {amount} ダメージを受けた！（残りHP: {currentHealth}）");
+
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        Debug.Log($"{gameObject.name} が倒れた！");
+
+        // プレイヤーにポイント加算
+        PlayerController player = FindObjectOfType<PlayerController>();
+        if (player != null)
+        {
+            player.AddPoint(point);
+        }
+
+        Destroy(gameObject);
     }
 }
