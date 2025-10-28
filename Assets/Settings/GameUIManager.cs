@@ -16,22 +16,26 @@ public class GameUIManager : MonoBehaviour
 
     [Header("Timer")]
     [SerializeField] private float startTime = 60f;
-    public float StartTime => startTime; // Player‘¤‚©‚çæ“¾‚Å‚«‚é‚æ‚¤‚É
+    public float StartTime => startTime; // Playerå´ã‹ã‚‰å–å¾—ã§ãã‚‹ã‚ˆã†ã«
 
     [Header("Color")]
-    [SerializeField] private Color normalColor = Color.white;     // ’ÊíF
-    [SerializeField] private Color selectedColor = Color.yellow;  // ‘I‘ğ’†‚ÌF
+    [SerializeField] private Color normalColor = Color.white;     // é€šå¸¸è‰²
+    [SerializeField] private Color selectedColor = Color.yellow;  // é¸æŠä¸­ã®è‰²
 
     private bool isGameOver = false;
     private bool isGameClear = false;
-    private int currentSelected = 0; // 0:ƒŠƒXƒ^[ƒg, 1:ƒ^ƒCƒgƒ‹
+    private int currentSelected = 0; // 0:ãƒªã‚¹ã‚¿ãƒ¼ãƒˆ, 1:ã‚¿ã‚¤ãƒˆãƒ«
+    private int bestScore = 0; // æœ€é«˜ã‚¹ã‚³ã‚¢
 
     private void Start()
     {
         gameOverUI?.SetActive(false);
         gameClearUI?.SetActive(false);
 
-        // ƒ{ƒ^ƒ“ƒCƒxƒ“ƒg“o˜^
+        // ä¿å­˜ã•ã‚ŒãŸã‚¹ã‚³ã‚¢ã‚’èª­ã¿è¾¼ã‚€
+        bestScore = PlayerPrefs.GetInt("bestScore", 0); // "bestScore"ãŒãªã„å ´åˆã¯0ã«è¨­å®š
+
+        // ãƒœã‚¿ãƒ³ã‚¤ãƒ™ãƒ³ãƒˆç™»éŒ²
         restartButton?.onClick.AddListener(Restart);
         titleButton?.onClick.AddListener(ReturnToTitle);
     }
@@ -44,7 +48,7 @@ public class GameUIManager : MonoBehaviour
         }
         else if (isGameClear)
         {
-            // ƒNƒŠƒA‚Í Enter ‚Åƒ^ƒCƒgƒ‹‚É–ß‚é
+            // ã‚¯ãƒªã‚¢æ™‚ã¯ Enter ã§ã‚¿ã‚¤ãƒˆãƒ«ã«æˆ»ã‚‹
             if (Input.GetKeyDown(KeyCode.Return))
             {
                 ReturnToTitle();
@@ -52,7 +56,7 @@ public class GameUIManager : MonoBehaviour
         }
     }
 
-    // --- HP•\¦XV ---
+    // --- HPè¡¨ç¤ºæ›´æ–° ---
     public void UpdateHealthUI(int currentHealth, int maxHealth)
     {
         if (healthText != null)
@@ -61,7 +65,7 @@ public class GameUIManager : MonoBehaviour
         }
     }
 
-    // --- ƒ^ƒCƒ}[XV ---
+    // --- ã‚¿ã‚¤ãƒãƒ¼æ›´æ–° ---
     public void UpdateTimerUI(float currentTime)
     {
         if (timerText != null)
@@ -70,7 +74,7 @@ public class GameUIManager : MonoBehaviour
         }
     }
 
-    // --- ƒQ[ƒ€ƒNƒŠƒAˆ— ---
+    // --- ã‚²ãƒ¼ãƒ ã‚¯ãƒªã‚¢å‡¦ç† ---
     public void GameClear()
     {
         if (isGameClear) return;
@@ -81,7 +85,7 @@ public class GameUIManager : MonoBehaviour
             gameClearUI.SetActive(true);
     }
 
-    // --- ƒQ[ƒ€ƒI[ƒo[ˆ— ---
+    // --- ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼å‡¦ç† ---
     public void GameOver()
     {
         if (isGameOver) return;
@@ -91,35 +95,50 @@ public class GameUIManager : MonoBehaviour
         if (gameOverUI != null)
         {
             gameOverUI.SetActive(true);
-            SelectRestartButton(); // ‰Šú‘I‘ğó‘Ô
+            SelectRestartButton(); // åˆæœŸé¸æŠçŠ¶æ…‹
         }
     }
 
-    // ÅIƒXƒRƒA‚ğ•\¦‚·‚éƒƒ\ƒbƒh
+    // æœ€çµ‚ã‚¹ã‚³ã‚¢ã‚’è¡¨ç¤ºã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
     public void DisplayFinalScore(int finalScore)
     {
-        // ƒQ[ƒ€ƒI[ƒo[‰æ–Ê‚âƒNƒŠƒA‰æ–Ê‚ÅÅIƒXƒRƒA‚ğ•\¦
+        // ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼ç”»é¢ã‚„ã‚¯ãƒªã‚¢ç”»é¢ã§æœ€çµ‚ã‚¹ã‚³ã‚¢ã‚’è¡¨ç¤º
         if (gameOverUI != null || gameClearUI != null)
         {
-            scoreText.text = $"ÅIƒXƒRƒA: {finalScore}";
+            scoreText.text = $"æœ€çµ‚ã‚¹ã‚³ã‚¢: {finalScore}";
+            
+            // æœ€çµ‚ã‚¹ã‚³ã‚¢ã‚’ä¿å­˜ã™ã‚‹å‡¦ç†
+            UpdateBestScore(finalScore);
+            Debug.Log($"bestScore:{bestScore}");
         }
     }
 
-    // --- ƒŠƒXƒ^[ƒg ---
+    //æœ€é«˜ã‚¹ã‚³ã‚¢ã®æ›´æ–°
+    public void UpdateBestScore(int finalScore)
+    {
+        if(finalScore > bestScore)
+        {
+            bestScore = finalScore;
+            PlayerPrefs.SetInt("bestScore", bestScore); // bestScoreã‚’ä¿å­˜
+            PlayerPrefs.Save(); // ä¿å­˜
+        }
+    }
+
+    // --- ãƒªã‚¹ã‚¿ãƒ¼ãƒˆ ---
     public void Restart()
     {
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
-    // --- ƒ^ƒCƒgƒ‹‚É–ß‚é ---
+    // --- ã‚¿ã‚¤ãƒˆãƒ«ã«æˆ»ã‚‹ ---
     public void ReturnToTitle()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene("MainMenu"); // © ƒ^ƒCƒgƒ‹ƒV[ƒ“–¼‚É•ÏX
+        SceneManager.LoadScene("MainMenu"); // â† ã‚¿ã‚¤ãƒˆãƒ«ã‚·ãƒ¼ãƒ³åã«å¤‰æ›´
     }
 
-    // --- ‘I‘ğ‘€ìˆ— ---
+    // --- é¸æŠæ“ä½œå‡¦ç† ---
     private void HandleGameOverInput()
     {
         if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
@@ -138,13 +157,13 @@ public class GameUIManager : MonoBehaviour
         }
     }
 
-    // --- ƒ{ƒ^ƒ“‘I‘ğˆ— ---
+    // --- ãƒœã‚¿ãƒ³é¸æŠå‡¦ç† ---
     private void SelectRestartButton()
     {
         currentSelected = 0;
         restartButton.Select();
 
-        // F•ÏX
+        // è‰²å¤‰æ›´
         var restartImage = restartButton.GetComponent<Image>();
         var titleImage = titleButton.GetComponent<Image>();
         if (restartImage != null) restartImage.color = selectedColor;
@@ -156,7 +175,7 @@ public class GameUIManager : MonoBehaviour
         currentSelected = 1;
         titleButton.Select();
 
-        // F•ÏX
+        // è‰²å¤‰æ›´
         var restartImage = restartButton.GetComponent<Image>();
         var titleImage = titleButton.GetComponent<Image>();
         if (restartImage != null) restartImage.color = normalColor;

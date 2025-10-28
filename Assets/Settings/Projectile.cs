@@ -34,7 +34,15 @@ public class Projectile : MonoBehaviour
             return;
         }
 
-        // それ以外のもの（壁など）に当たったら削除
-        Destroy(gameObject);
+        WalkEnemy walkenemy = collision.GetComponent<WalkEnemy>();
+        if (walkenemy != null)
+        {
+            walkenemy.TakeDamage(damage);
+            Destroy(gameObject);
+
+
+            // それ以外のもの（壁など）に当たったら削除
+            Destroy(gameObject);
+        }
     }
 }

@@ -1,3 +1,4 @@
+using System.Drawing;
 using UnityEngine;
 
 public class WalkEnemy : MonoBehaviour,IEnemyStatus
