@@ -1,9 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement; // シーン制御用
-using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;              // UI表示用
-using static UnityEditor.PlayerSettings;
 
 public class PlayerController : MonoBehaviour
 {
@@ -38,6 +36,8 @@ public class PlayerController : MonoBehaviour
     private int Point = 0; // ポイント(アイテムを取ると上昇)
     private int scoreForTime; // 時間で加算するスコア
     private int scoreForHealth;
+
+    [SerializeField] private ScoreManager scoreManager;  // ScoreManagerを参照
 
     private Rigidbody2D rb;
     private BoxCollider2D col;
@@ -116,7 +116,6 @@ public class PlayerController : MonoBehaviour
         {
             Debug.Log("uiManager が接続されています。");
         }
-
     }
 
     void Update()
@@ -145,7 +144,6 @@ public class PlayerController : MonoBehaviour
             GameOver();
             return;
         }
-
 
         // 入力
         float move = Input.GetAxisRaw("Horizontal"); // -1,0,1
@@ -238,7 +236,6 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-
         // ジャンプ入力
         if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.W)) && isGrounded)
         {
@@ -279,7 +276,6 @@ public class PlayerController : MonoBehaviour
 
         // --- 敵との接触判定 ---
         HandleEnemyCollision();
-
     }
 
     // --- しゃがみ開始 ---
@@ -415,7 +411,7 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
-        
+
         // アイテムとの接触判定
         GameObject[] items = GameObject.FindGameObjectsWithTag("Item");
         foreach (GameObject item in items)
@@ -454,7 +450,6 @@ public class PlayerController : MonoBehaviour
     {
         Debug.Log("何かに衝突しました: " + collision.gameObject.name);
     }
-
 
     private void OnCollisionStay2D(Collision2D collision)
     {
@@ -502,6 +497,9 @@ public class PlayerController : MonoBehaviour
 
         // --- UI側に通知 ---
         uiManager?.GameOver();
+
+        // ベストスコアの更新
+        UpdateBestScore(score);
     }
 
     private void GameClear()
@@ -511,7 +509,7 @@ public class PlayerController : MonoBehaviour
 
         rb.linearVelocity = Vector2.zero;
         rb.simulated = false;
-        
+
         Time.timeScale = 0f;
 
         // スコア計算
@@ -519,6 +517,9 @@ public class PlayerController : MonoBehaviour
 
         // --- UI側に通知 ---
         uiManager?.GameClear();
+
+        // ベストスコアの更新
+        UpdateBestScore(score);
     }
 
 
@@ -541,5 +542,17 @@ public class PlayerController : MonoBehaviour
 
         Debug.Log("最終スコア: " + score);
         uiManager?.DisplayFinalScore(score);
+    }
+
+    private void UpdateBestScore(int currentScore)
+    {
+        // 現在のスコアがベストスコアより大きい場合に更新
+        int bestScore = PlayerPrefs.GetInt("BestScore", 0);
+        if (currentScore > bestScore)
+        {
+            PlayerPrefs.SetInt("BestScore", currentScore);  // 新しいベストスコアを保存
+            PlayerPrefs.Save();  // 保存
+        }
+        Debug.Log("Best Score Updated: " + PlayerPrefs.GetInt("BestScore"));
     }
 }
