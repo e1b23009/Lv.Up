@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class WalkEnemy : MonoBehaviour,IEnemyStatus
 {
-    [Header("攻撃・AI設定")]
+    [Header("攻撃設定")]
     public int damage = 1;             // プレイヤーに与えるダメージ
     public float moveSpeed = 3f;       // 移動速度
 
@@ -73,7 +73,7 @@ public class WalkEnemy : MonoBehaviour,IEnemyStatus
     // �n�ʂƂ̐ڐG����i�^�O�Ŕ���j
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Ground"))
+        if (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Enemy"))
         {
             groundContactCount++;
             isGrounded = true;

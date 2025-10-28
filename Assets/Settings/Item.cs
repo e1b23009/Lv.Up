@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Item : MonoBehaviour
 {
-    public int point = 1;
+    public int point = 5;
 
     private Rigidbody2D rb;
     private Transform player;
