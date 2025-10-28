@@ -69,6 +69,7 @@ public class Enemy : MonoBehaviour,IEnemyStatus
         {
             groundContactCount++;
             isGrounded = true;
+            Debug.Log($"{gameObject.name}のgroundContactCount:{groundContactCount}");
         }
     }
 
@@ -83,6 +84,7 @@ public class Enemy : MonoBehaviour,IEnemyStatus
                 isGrounded = false;
             }
         }
+        Debug.Log($"{gameObject.name}のgroundContactCount:{groundContactCount}");
     }
 
     // === ここから追加部分 ===

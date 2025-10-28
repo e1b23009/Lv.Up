@@ -8,6 +8,7 @@ public class GameUIManager : MonoBehaviour
     [Header("UI Elements")]
     [SerializeField] private TextMeshProUGUI healthText;
     [SerializeField] private TextMeshProUGUI timerText;
+    [SerializeField] private TextMeshProUGUI scoreText;
     [SerializeField] private GameObject gameOverUI;
     [SerializeField] private GameObject gameClearUI;
     [SerializeField] private Button restartButton;
@@ -65,9 +66,7 @@ public class GameUIManager : MonoBehaviour
     {
         if (timerText != null)
         {
-            int minutes = Mathf.FloorToInt(currentTime / 60f);
-            int seconds = Mathf.FloorToInt(currentTime % 60f);
-            timerText.text = $"TIME: {minutes:00}:{seconds:00}";
+            timerText.text = $"TIME: {currentTime:00}s";
         }
     }
 
@@ -93,6 +92,16 @@ public class GameUIManager : MonoBehaviour
         {
             gameOverUI.SetActive(true);
             SelectRestartButton(); // 初期選択状態
+        }
+    }
+
+    // 最終スコアを表示するメソッド
+    public void DisplayFinalScore(int finalScore)
+    {
+        // ゲームオーバー画面やクリア画面で最終スコアを表示
+        if (gameOverUI != null || gameClearUI != null)
+        {
+            scoreText.text = $"最終スコア: {finalScore}";
         }
     }
 

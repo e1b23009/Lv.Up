@@ -33,7 +33,12 @@ public class PlayerController : MonoBehaviour
     public float projectileSpeed = 10f;  // 弾の速度
     public Transform firePoint;          // 弾を発射する位置
 
+    [Header("Score Settings")]
+    private int score = 0; // 現在のスコア
     private int Point = 0; // ポイント(アイテムを取ると上昇)
+    private int scoreForTime; // 時間で加算するスコア
+    private int scoreForHealth;
+
     private Rigidbody2D rb;
     private BoxCollider2D col;
     private bool isGrounded = false;
@@ -74,6 +79,9 @@ public class PlayerController : MonoBehaviour
         currentHealth = maxHealth;
         spawnPoint = transform.position;
         currentTime = uiManager != null ? uiManager.StartTime : 60f;
+        score = 0;
+        scoreForTime = 0;
+        scoreForHealth = 0;
 
         // 初期UI表示
         uiManager?.UpdateHealthUI(currentHealth, maxHealth);
@@ -489,6 +497,9 @@ public class PlayerController : MonoBehaviour
 
         Time.timeScale = 0f;
 
+        // スコア計算
+        CalculateFinalScore();
+
         // --- UI側に通知 ---
         uiManager?.GameOver();
     }
@@ -503,6 +514,9 @@ public class PlayerController : MonoBehaviour
         
         Time.timeScale = 0f;
 
+        // スコア計算
+        CalculateFinalScore();
+
         // --- UI側に通知 ---
         uiManager?.GameClear();
     }
@@ -514,4 +528,18 @@ public class PlayerController : MonoBehaviour
         Debug.Log("現在のポイント: " + Point);
     }
 
+    // スコア計算
+    public void CalculateFinalScore()
+    {
+        // 残りの時間に応じてスコアを増加
+        if (isGameClear)
+        {
+            scoreForTime = Mathf.FloorToInt(currentTime * 10); // 時間に基づいてスコアを増加（1秒あたり10ポイント）
+            scoreForHealth = Mathf.FloorToInt(currentHealth * 10); // 体力に基づいてスコアを増加（体力1あたり10ポイント
+        }
+        score = Point + scoreForTime + scoreForHealth;
+
+        Debug.Log("最終スコア: " + score);
+        uiManager?.DisplayFinalScore(score);
+    }
 }
