@@ -3,15 +3,26 @@ using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System.Collections;
+using TMPro;
 
 public class MainMenu : MonoBehaviour
 {
     [SerializeField] private Button startButton;   // Startボタン
     [SerializeField] private Button quitButton;    // Quitボタン
     [SerializeField] private Image fadePanel;      // フェード用黒パネル
+    [SerializeField] private TextMeshProUGUI bestScoreText;  // Best ScoreのUI表示
 
     private void Start()
     {
+        // スコアマネージャを取得
+        ScoreManager scoreManager = FindObjectOfType<ScoreManager>();
+
+        // BestScore.txtからベストスコアを読み込む
+        int bestScore = PlayerPrefs.GetInt("BestScore", 0);
+
+        // UIにベストスコアを表示
+        bestScoreText.text = "Best Score: " + bestScore.ToString();
+
         // Startボタン設定
         if (startButton != null)
             startButton.onClick.AddListener(OnStartGame);
