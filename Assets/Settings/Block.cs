@@ -29,7 +29,7 @@ public class Block : MonoBehaviour
     private void Update()
     {
         // プレイヤーが近くにいて、シフトキーが押されたら破壊
-        if (playerNearby && Input.GetKeyDown(KeyCode.E))
+        if (playerNearby && Input.GetAxis("LT") > 0.5f)
         {
             // アイテムを生成（ブロックの位置に出現）
             if (itemPrefab != null)

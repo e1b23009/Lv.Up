@@ -146,9 +146,10 @@ public class PlayerController : MonoBehaviour
         }
 
         // 入力
-        float move = Input.GetAxisRaw("Horizontal"); // -1,0,1
-        bool holdCrouchKey = Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S);
-        bool holdDash = Input.GetKey(KeyCode.LeftShift);
+        float move = Input.GetAxis("Horizontal");  // 横方向 (左スティック)
+        float verticalMove = Input.GetAxis("Vertical");
+        bool holdCrouchKey = (verticalMove < -0.5);
+        bool holdDash = Input.GetAxis("RT") > 0.5f;
 
         // --- しゃがみ制御 ---
         // 地上でキーを押したらしゃがみに入る
@@ -237,11 +238,11 @@ public class PlayerController : MonoBehaviour
         }
 
         // ジャンプ入力
-        if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.W)) && isGrounded)
+        if (Input.GetButtonDown("A") && isGrounded)
         {
             float jumpPower = jumpForce;
 
-            if (Input.GetKey(KeyCode.LeftShift) && !isCrouching)
+            if (holdDash && !isCrouching)
             {
                 jumpPower *= 1.2f;
             }
@@ -253,8 +254,8 @@ public class PlayerController : MonoBehaviour
             rb.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
         }
 
-        // Qキーを押したときに弾を発射
-        if (Input.GetKeyDown(KeyCode.Q))
+        // 弾を発射
+        if (Input.GetButtonDown("B"))
         {
             FireProjectile();
         }
