@@ -49,7 +49,7 @@ public class GameUIManager : MonoBehaviour
         else if (isGameClear)
         {
             // クリア時は Enter でタイトルに戻る
-            if (Input.GetKeyDown(KeyCode.Return))
+            if (Input.GetButtonDown("A"))
             {
                 ReturnToTitle();
             }
@@ -141,16 +141,17 @@ public class GameUIManager : MonoBehaviour
     // --- 選択操作処理 ---
     private void HandleGameOverInput()
     {
-        if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+        float verticalMove = Input.GetAxis("Vertical");
+        if (verticalMove > 0)
         {
             SelectRestartButton();
         }
-        else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
+        else if (verticalMove < 0)
         {
             SelectTitleButton();
         }
 
-        if (Input.GetKeyDown(KeyCode.Return))
+        if (Input.GetButtonDown("A"))
         {
             if (currentSelected == 0) Restart();
             else ReturnToTitle();
