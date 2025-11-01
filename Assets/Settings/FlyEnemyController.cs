@@ -7,12 +7,14 @@ public class FlyEnemy : MonoBehaviour,IEnemyStatus
     public int damage = 1;             // プレイヤーに与えるダメージ
     public float moveSpeed = 3f;       // 移動速度
     public float detectRadius = 10f;   // プレイヤーを検知する距離
+    public bool doDespawn = false;
 
     [Header("体力設定")]
     public int maxHealth = 3;          // 最大体力
     private int currentHealth;         // 現在の体力
 
     public int point = 10; // 倒したときにもらえるポイント
+    public float despawnTime = 5.0f;
 
     public int Damage { get; set; }
     public float MoveSpeed { get; set; }
@@ -23,6 +25,8 @@ public class FlyEnemy : MonoBehaviour,IEnemyStatus
 
     private bool isFacingRight = false;
     private int groundContactCount = 0;
+
+
     private bool isFlying = false;
 
     void Start()
@@ -58,6 +62,20 @@ public class FlyEnemy : MonoBehaviour,IEnemyStatus
         // ���a detectRadius �ȓ��Ȃ�v���C���[��x���W�Ɍ������Ĉړ�
 
         Vector2 targetPos;
+
+        // デスポーンする場合、時間が来たら消える
+        if (doDespawn)
+        {
+            if (despawnTime > 0) 
+            {
+                despawnTime -= Time.deltaTime;
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
+
         // プレイヤーが索敵範囲内に入ったら移動可能にする
         if (!isFlying && (distance <= detectRadius)) isFlying = true;
 
@@ -84,13 +102,19 @@ public class FlyEnemy : MonoBehaviour,IEnemyStatus
             
             if (groundContactCount == 1) // 壁に接触している状態
             {
-                if (isFacingRight) // 右を向いている場合
-                {
-                    isFacingRight = false;
+                if (!doDespawn) { // デスポーンしない場合
+                    if (isFacingRight) // 右を向いている場合
+                    {
+                        isFacingRight = false;
+                    }
+                    else // 左向きの場合
+                    {
+                        isFacingRight = true;
+                    }
                 }
-                else // 左向きの場合
+                else // デスポーンする場合
                 {
-                    isFacingRight = true;
+                    Destroy(gameObject);
                 }
             }
         }
@@ -107,6 +131,12 @@ public class FlyEnemy : MonoBehaviour,IEnemyStatus
 
             }
         }
+    }
+
+    public void SetFacing(bool facing)
+    {
+        
+        isFacingRight = facing;
     }
 
     // === ここから追加部分 ===
