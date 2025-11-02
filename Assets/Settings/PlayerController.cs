@@ -174,12 +174,12 @@ public class PlayerController : MonoBehaviour
         if (isCrouching && isGrounded)
         {
             // しゃがみ中 & 地面にいる → 移動禁止
-            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+            rb.linearVelocity = new Vector2(0f + moveGroundSpeed, rb.linearVelocity.y);
         }
         else
         {
             // 通常移動（空中でしゃがみ中なら低速で移動）
-            rb.linearVelocity = new Vector2(move * currentSpeed, rb.linearVelocity.y);
+            rb.linearVelocity = new Vector2(move * currentSpeed + moveGroundSpeed, rb.linearVelocity.y);
         }
 
         // --- プレイヤーの向きを更新（しゃがみ中はスケール変更しない） ---

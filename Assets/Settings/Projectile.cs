@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
-    public int damage = 1; // ’e‚ÌUŒ‚—Í
+    public int damage = 1; // ï¿½eï¿½ÌUï¿½ï¿½ï¿½ï¿½
 
-    private Collider2D shooter; // ’e‚ğŒ‚‚Á‚½ƒvƒŒƒCƒ„[‚ÌƒRƒ‰ƒCƒ_[
+    private Collider2D shooter; // ï¿½eï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½ÌƒRï¿½ï¿½ï¿½Cï¿½_ï¿½[
 
     public void SetShooter(Collider2D shooterCollider)
     {
@@ -13,11 +13,11 @@ public class Projectile : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // Œ‚‚Á‚½liƒvƒŒƒCƒ„[‚È‚Çj‚Æ‚ÍÕ“Ë‚µ‚È‚¢
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½lï¿½iï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½È‚Çjï¿½Æ‚ÍÕ“Ë‚ï¿½ï¿½È‚ï¿½
         if (collision == shooter)
             return;
 
-        // “G‚É“–‚½‚Á‚½‚çƒ_ƒ[ƒW
+        // ï¿½Gï¿½É“ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½[ï¿½W
         Enemy enemy = collision.GetComponent<Enemy>();
         if (enemy != null)
         {
@@ -34,6 +34,14 @@ public class Projectile : MonoBehaviour
             return;
         }
 
+        LastBoss lastboss = collision.GetComponent<LastBoss>();
+        if (lastboss != null)
+        {
+            lastboss.TakeDamage(damage);
+            Destroy(gameObject);
+            return;
+        }
+
         WalkEnemy walkenemy = collision.GetComponent<WalkEnemy>();
         if (walkenemy != null)
         {
@@ -41,7 +49,18 @@ public class Projectile : MonoBehaviour
             Destroy(gameObject);
 
 
-            // ‚»‚êˆÈŠO‚Ì‚à‚Ìi•Ç‚È‚Çj‚É“–‚½‚Á‚½‚çíœ
+            // ï¿½ï¿½ï¿½ï¿½ÈŠOï¿½Ì‚ï¿½ï¿½Ìiï¿½Ç‚È‚Çjï¿½É“ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½íœ
+            Destroy(gameObject);
+        }
+
+        FlyEnemy flyenemy = collision.GetComponent<FlyEnemy>();
+        if (flyenemy != null)
+        {
+            flyenemy.TakeDamage(damage);
+            Destroy(gameObject);
+
+
+            // ï¿½ï¿½ï¿½ï¿½ÈŠOï¿½Ì‚ï¿½ï¿½Ìiï¿½Ç‚È‚Çjï¿½É“ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½íœ
             Destroy(gameObject);
         }
     }
