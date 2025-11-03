@@ -18,8 +18,7 @@ public class AudioManager : MonoBehaviour
         // シングルトン確立
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
-
+        
         // 子にBGM/SE用オブジェクトを用意（Inspector設定が無くても必ず作る）
         bgmSource = Create2DSource("BGM_Source", loop: true);
         seSource = Create2DSource("SE_Source", loop: false);
