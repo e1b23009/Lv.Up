@@ -80,11 +80,6 @@
 
 ・キャラクターアセット:　         https://www.shoeisha.co.jp/book/download/9784798179353/detail　
 
-
-
-### 参考文献
-キャラクターや床などのアセットは株式会社翔泳社 STUDIO SHIN（スタジオ シン）様からお借りしています．
-
 ## Author
 
 上田大翔
