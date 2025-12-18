@@ -64,20 +64,26 @@ joyConのボタンを押す・振るといった基本操作で遊ぶ、1対1で
 ・フィールドBGM：https://maou.audio/sound/game/maou_game_field06.ogg
 
 ・キャラクターのオブジェクトまたはSE：
-・キャラクターアセット:　https://www.shoeisha.co.jp/book/download/9784798179353/detail　
 ・背景:https://sozaino.site/wp-content/uploads/2022/11/sougen53.png
-・シールドエフェクト:Miniature Army 2D V.1 [Medieval Style] | 2D Characters | Unity Asset Store
-・死亡音:https://arspark.jp/material/wp-content/uploads/2023/05/
-arsnd_00139_deathon.mp3
-・リスポーン音:https://arspark.jp/material/wp-content/uploads
-/2023/08/arsnd_00237_powerupp.mp3
-・ダメージ音:https://www.springin.org/wp-content/uploads/2022/07/スクラッチ.mp3　
-・ガード成功時:https://www.springin.org/wp-content/uploads/2022/06/剣ぶつかり合い2.mp3　
-・必殺音:https://www.springin.org/wp-content/uploads/2022/06
-/爆発.mp3
-・ゲーム終了時の音:https://arspark.jp/material/wp-content
-/uploads/202 3/04/arsnd_00043_gameclea.mp3
-・ジャンプの音:https://umipla.com/sekoubou/soundeffect/se_jump.mp3　
+・メニュー選択音:
+  https://soundeffect-lab.info/sound/button/mp3/cursor1.mp3
+・決定音:https://soundeffect-lab.info/sound/button/mp3/decision35.mp3
+・ジャンプ音:
+  https://soundeffect-lab.info/sound/anime/mp3/cute-motion1.mp3
+・着地音:https://soundeffect-lab.info/sound/battle/mp3/landing1.mp3
+・射撃音:https://soundeffect-lab.info/sound/battle/mp3/shot1.mp3
+・アイテム音:
+  https://soundeffect-lab.info/sound/battle/mp3/highspeed-movement1.mp3
+ ・ブロック破壊音:
+  https://soundeffect-lab.info/sound/anime/mp3/ankle-spoil1.mp3
+・被弾音:https://soundeffect-lab.info/sound/battle/mp3/slap1.mp3
+・ゲームクリア時:
+  https://soundeffect-lab.info/sound/anime/mp3/levelup1.mp3
+・ゲームオーバー時:
+  https://soundeffect-lab.info/sound/anime/mp3/stupid5.mp3
+
+・キャラクターアセット:　         https://www.shoeisha.co.jp/book/download/9784798179353/detail　
+
 
 
 ### 参考文献
