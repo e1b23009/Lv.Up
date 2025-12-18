@@ -4,7 +4,7 @@
 
 ### UnityHubのダウンロード
 1. https://unity.com/ja/download からunityhubをインストールする。
-2. UnityHubのInstallsタブのInstallEditerから2022.3.40f1を選択する。
+2. UnityHubのInstallsタブのInstallEditerから6000.2.9f1を選択する。
 
 ### Unityプロジェクトのダウンロード
 1. githubにてunityプロジェクトをダウンロードする。
