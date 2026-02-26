@@ -19,6 +19,15 @@
 1.	LV.UPの中にある「UniSideGame_Assets(LV.UP)」をダウンロード後解凍してください。
 2.解答場所は先ほどダウンロードしたフォルダの中の「Assets」の中に解凍してください。
 
+### フォントの設定
+1． Unity内の、Window -> TextMeshPro -> Font Asset Createrで開きます。
+    <img width="221" height="197" alt="image" src="https://github.com/user-attachments/assets/b4aaa99f-1052-47a8-b210-3df730b2822a" />
+
+    以上の設定で[Generate Font Atlas]をクリック
+    処理が完了すれば「Save」で保存
+2．Canvas内のscoreText, GameOverUIのRestartButton,titleButton, GameClearUIのtitleButton
+   これらのFontAssetをNotoSansJP-Mediumに変更する。
+
 ### コントローラーの接続
 1. コントローラーのXBOXボタンを押す。
 
